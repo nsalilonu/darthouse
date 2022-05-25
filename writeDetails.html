@@ -1,0 +1,791 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8" name="viewport"/>
+    <title>Darthouse: Write a Review</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="icon" type="image/x-icon" href="static/Images/favicon.ico">
+    <script src="static/jquery-v.3.6.0.js"></script>
+</head>
+<body style="background-color: rgb(0, 105, 62); text-align: center; float:center; ">
+    <nav class="navbar navbar-expand-lg" style="background-color: rgb(18, 49, 43); padding-left: 5px; padding-right: 5px;">
+        <a class="navbar-brand" href="./" style="font-variant: small-caps;
+            font-stretch: ultra-expanded;
+            font-weight: bold; font-family: 'Ruda', sans-serif; color: white; font-size: 30px;">DartHouse</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" style="font-family: 'Ruda', sans-serif; color: white;" href="./">Home <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                        <a class="nav-link" style="font-family: 'Ruda', sans-serif; color: white;" href="./about">About</a>
+                    </li>
+                <li class="nav-item">
+                    <a class="nav-link" style="font-family: 'Ruda', sans-serif; color: white;" href="./writeDetails">Create Review</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" style="font-family: 'Ruda', sans-serif; color: white;" href="./findDetails">Find Review</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div class="container-fluid" style="color: white; font-size: 70px; font-family: 'Lexend Deca', sans-serif; padding: 15px; text-align: center;">
+        <h1>Review Your
+            Property</h1>
+    </div>
+    <div class="container-fluid" style="padding: 10px;">
+        <form name="review" id="review" action="/createReview" method="GET">
+            <div class="form-group">
+                <div class="container-fluid" style="background-color: rgb(18, 49, 43);">
+                    <div class="row" style="padding: 10px; text-align: left;">
+                        <div class="col" style="color: white; font-size: 20px; font-family: 'Lexend Deca', sans-serif;">
+                            What is the address of the property you'd like to review?
+                        </div>
+                    </div>
+                    <div class="row" style="padding:10px; text-align: left;">
+                        <div class="col">
+                            <input class="form-control" type="text"
+                                   name="address"
+                                   style="border:2px solid black;
+                                   border-radius: 5px;
+                                   padding:5px; 
+                                   text-align:left;"
+                                   placeholder="Address of the property" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="container-fluid" style="background-color: rgb(0, 105, 62);">
+                    <div class="row" style="padding: 10px; text-align: left; ">
+                        <div class="col" style="color: white; font-size: 20px; font-family: 'Lexend Deca', sans-serif;">
+                            When did you live at this property? Enter the current date for the end date if you still reside
+                            there.
+                        </div>
+                    </div>
+                    <div class="row" style="padding:10px; text-align: left; color: white; font-size: 20px; font-family: 'Lexend Deca', sans-serif;">
+                        <div class="col">
+                            Start Date:
+                        </div>
+                    </div>
+                    <div class="row" style="padding: 10px;">
+                        <div class="col">
+                            <input class="form-control" type="date"
+                                   name="startDate"
+                                   style="border:2px solid black;
+                           border-radius: 5px;
+                           padding:5px;
+                           text-align:left;
+                           float: left;"
+                                   required>
+                        </div>
+                    </div>
+                    <div class="row" style="padding:10px; text-align: left; color: white; font-size: 20px; font-family: 'Lexend Deca', sans-serif;">
+                        <div class="col">
+                            End Date:
+                        </div>
+                    </div>
+                    <div class="row" style="padding: 10px;">
+                        <div class="col">
+                            <input class="form-control" type="date"
+                                   name="endDate" 
+                                   style="border:2px solid black;
+                           border-radius: 5px;
+                           padding:5px;
+                           text-align:left;
+                           float: left;"
+                                   required>
+                        </div>
+                    </div>
+                </div>
+                <div class="container-fluid" style="background-color: rgb(18, 49, 43);">
+                        <div class="row" style="padding: 10px; text-align: left; ">
+                            <div class="col" style="color: white; font-size: 20px; font-family: 'Lexend Deca', sans-serif;">
+                                Overall Cleanliness Before Move-in
+                            </div>
+                        </div>
+                        <div class="row" style="padding:10px; text-align: left;">
+                            <div class="col">
+                                <img src="static/Images/star-24-white.png" id="clean1">
+                                <img src="static/Images/star-24-white.png" id="clean2">
+                                <img src="static/Images/star-24-white.png" id="clean3">
+                                <img src="static/Images/star-24-white.png" id="clean4">
+                                <img src="static/Images/star-24-white.png" id="clean5">
+                                <input type="text" class="form-control" id="cleanliness" name="cleanliness" style="display: none;">
+                            </div>
+                        </div>
+                        <div class="row" style="padding:10px; text-align: left;">
+                            <div class="col">
+                                <textarea class="form-control" name="cleanlinessComments" rows="4" cols="60"
+                                          placeholder="Additional comments?"></textarea>
+                            </div>
+                        </div>
+                </div>
+                <div class="container-fluid" style="background-color: rgb(0, 105, 62)">
+                    <div class="row" style="padding: 10px; text-align: left;">
+                        <div class="col" style="color: white; font-size: 20px; font-family: 'Lexend Deca', sans-serif;">
+                            Noise
+                        </div>
+                    </div>
+                    <div class="row" style="padding:10px; text-align: left;">
+                        <div class="col">
+                            <img src="static/Images/star-24-white.png" id="noise1">
+                            <img src="static/Images/star-24-white.png" id="noise2">
+                            <img src="static/Images/star-24-white.png" id="noise3">
+                            <img src="static/Images/star-24-white.png" id="noise4">
+                            <img src="static/Images/star-24-white.png" id="noise5">
+                            <input type="text" class="form-control" value="" id="noise" name="noise" style="display: none;">
+                        </div>
+                    </div>
+                    <div class="row" style="padding:10px; text-align: left;">
+                        <div class="col">
+                            <textarea class="form-control" name="noiseComments" rows="4" cols="60" placeholder="Additional comments?"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="container-fluid" style="background-color: rgb(18, 49, 43);">
+                        <div class="row" style="padding: 10px; text-align: left; background-color: rgb(18, 49, 43);">
+                            <div class="col" style="color: white; font-size: 20px; font-family: 'Lexend Deca', sans-serif;">
+                                Landlord Responsiveness
+                            </div>
+                        </div>
+                        <div class="row" style="padding:10px; text-align: left;">
+                            <div class="col">
+                                <img src="static/Images/star-24-white.png" id="responsive1">
+                                <img src="static/Images/star-24-white.png" id="responsive2">
+                                <img src="static/Images/star-24-white.png" id="responsive3">
+                                <img src="static/Images/star-24-white.png" id="responsive4">
+                                <img src="static/Images/star-24-white.png" id="responsive5">
+                                <input class="form-control" type="hidden" value="" id="responsive" name="responsive">
+                            </div>
+                        </div>
+                        <div class="row" style="padding:10px; text-align: left;">
+                            <div class="col">
+                                <textarea class="form-control" name="responsiveComments" rows="4" cols="60"
+                                          placeholder="Additional comments?"></textarea>
+                            </div>
+                        </div>
+                </div>
+                <div class="container-fluid" style="background-color: rgb(0, 105, 62);">
+                    <div class="row" style="padding: 10px; text-align: left;">
+                        <div class="col" style="color: white; font-size: 20px; font-family: 'Lexend Deca', sans-serif;">
+                            Overall Landlord Quality: (Friendliness, Flexibility, Reliability, Fairness)
+                        </div>
+                    </div>
+                    <div class="row" style="padding:10px; text-align: left;">
+                        <div class="col">
+                            <img src="static/Images/star-24-white.png" id="landlord1">
+                            <img src="static/Images/star-24-white.png" id="landlord2">
+                            <img src="static/Images/star-24-white.png" id="landlord3">
+                            <img src="static/Images/star-24-white.png" id="landlord4">
+                            <img src="static/Images/star-24-white.png" id="landlord5">
+                            <input class="form-control" type="hidden" value="" id="landlord" name="landlord">
+                        </div>
+                    </div>
+                    <div class="row" style="padding:10px; text-align: left;">
+                        <div class="col">
+                            <textarea class="form-control" name="landlordComments" rows="4" cols="60" placeholder="Additional comments?"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="container-fluid" style="background-color: rgb(18, 49, 43);">
+                    <div class="row" style="padding: 10px; text-align: left; ">
+                        <div class="col" style="color: white; font-size: 20px; font-family: 'Lexend Deca', sans-serif;">
+                            Pest Control
+                        </div>
+                    </div>
+                    <div class="row" style="padding:10px; text-align: left; background-color: rgb(18, 49, 43);">
+                        <div class="col">
+                            <img src="static/Images/star-24-white.png" id="pest1">
+                            <img src="static/Images/star-24-white.png" id="pest2">
+                            <img src="static/Images/star-24-white.png" id="pest3">
+                            <img src="static/Images/star-24-white.png" id="pest4">
+                            <img src="static/Images/star-24-white.png" id="pest5">
+                            <input class="form-control" type="hidden" value="" id="pest" name="pest">
+                        </div>
+                    </div>
+                    <div class="row" style="padding:10px; text-align: left; background-color: rgb(18, 49, 43);">
+                        <div class="col">
+                            <textarea class="form-control" name="pestComments" rows="4" cols="60"
+                                      placeholder="Additional comments?"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="container-fluid" style="background-color: rgb(0, 105, 62);">
+                    <div class="row" style="padding: 10px; text-align: left;">
+                        <div class="col" style="color: white; font-size: 20px; font-family: 'Lexend Deca', sans-serif;">
+                            Safety of Neighborhood
+                        </div>
+                    </div>
+                    <div class="row" style="padding:10px; text-align: left;">
+                        <div class="col">
+                            <img src="static/Images/star-24-white.png" id="safety1">
+                            <img src="static/Images/star-24-white.png" id="safety2">
+                            <img src="static/Images/star-24-white.png" id="safety3">
+                            <img src="static/Images/star-24-white.png" id="safety4">
+                            <img src="static/Images/star-24-white.png" id="safety5">
+                            <input class="form-control" type="hidden" value="" id="safety" name="safety">
+                        </div>
+                    </div>
+                    <div class="row" style="padding:10px; text-align: left;">
+                        <div class="col">
+                            <textarea class="form-control" name="safetyComments" rows="4" cols="60" placeholder="Additional comments?"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="container-fluid" style="background-color: rgb(18, 49, 43);">
+                    <div class="row" style="padding: 10px; text-align: left;">
+                        <div class="col" style="color: white; font-size: 20px; font-family: 'Lexend Deca', sans-serif;">
+                            Appliance Quality
+                        </div>
+                    </div>
+                    <div class="row" style="padding:10px; text-align: left; background-color: rgb(18, 49, 43);">
+                        <div class="col">
+                            <img src="static/Images/star-24-white.png" id="appliance1">
+                            <img src="static/Images/star-24-white.png" id="appliance2">
+                            <img src="static/Images/star-24-white.png" id="appliance3">
+                            <img src="static/Images/star-24-white.png" id="appliance4">
+                            <img src="static/Images/star-24-white.png" id="appliance5">
+                            <input class="form-control" type="hidden" value="" id="appliance" name="appliance">
+                        </div>
+                    </div>
+                    <div class="row" style="padding:10px; text-align: left;">
+                        <div class="col">
+                            <textarea class="form-control" name="applianceComments" rows="4" cols="60"
+                                      placeholder="Additional comments?"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="container-fluid" style="background-color: rgb(0, 105, 62);">
+                    <div class="row" style="padding: 10px; text-align: left; ">
+                        <div class="col" style="color: white; font-size: 20px; font-family: 'Lexend Deca', sans-serif;">
+                            Did you take public transportation or a shuttle service to/from your home?<br>
+                            <input class="form-check-input" type="radio" name="transportBool" id="transportYes">
+                            <label for="transportYes">Yes</label><br>
+                            <input class="form-check-input" type="radio" name="transportBool" id="transportNo">
+                            <label for="transportYes">No</label><br>
+                        </div>
+                    </div>
+                    <div class="row" id="transportAvailable1"
+                         style="padding: 10px; text-align: left; display: none;">
+                        <div class="col" style="color: white; font-size: 20px; font-family: 'Lexend Deca', sans-serif;">
+                            Availability of Transportation:
+                        </div>
+                    </div>
+                    <div class="row" id="transportAvailable2"
+                         style="padding:10px; text-align: left; display: none;">
+                        <div class="col">
+                            <img src="static/Images/star-24-white.png" id="transport1">
+                            <img src="static/Images/star-24-white.png" id="transport2">
+                            <img src="static/Images/star-24-white.png" id="transport3">
+                            <img src="static/Images/star-24-white.png" id="transport4">
+                            <img src="static/Images/star-24-white.png" id="transport5">
+                            <input class="form-control" type="hidden" value="" id="transport" name="transport">
+                        </div>
+                    </div>
+                    <div class="row" style="padding:10px; text-align: left;">
+                        <div class="col">
+                            <textarea class="form-control" name="transportComments" rows="4" cols="60" placeholder="Additional comments?"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="container-fluid" style="background-color: rgb(18, 49, 43);">
+                    <div class="row" style="padding: 10px; text-align: left;">
+                        <div class="col" style="color: white; font-size: 20px; font-family: 'Lexend Deca', sans-serif;">
+                            Did your home come furnished?<br>
+                            <input class="form-check-input" type="radio" name="furnishedBool" id="furnishedYes">
+                            <label for="furnishedYes">Yes</label><br>
+                            <input class="form-check-input" type="radio" name="furnishedBool" id="furnishedNo">
+                            <label for="furnishedYes">No</label><br>
+                        </div>
+                    </div>
+                    <div class="row" id="furnitureQuality1"
+                         style="padding: 10px; text-align: left; display: none;">
+                        <div class="col" style="color: white; font-size: 20px; font-family: 'Lexend Deca', sans-serif;">
+                            Furniture Quality
+                        </div>
+                    </div>
+                    <div class="row" id="furnitureQuality2"
+                         style="padding:10px; text-align: left; display: none;">
+                        <div class="col">
+                            <img src="static/Images/star-24-white.png" id="furnished1">
+                            <img src="static/Images/star-24-white.png" id="furnished2">
+                            <img src="static/Images/star-24-white.png" id="furnished3">
+                            <img src="static/Images/star-24-white.png" id="furnished4">
+                            <img src="static/Images/star-24-white.png" id="furnished5">
+                            <input class="form-control" type="hidden" value="" id="furnished" name="furnished">
+                        </div>
+                    </div>
+                    <div class="row" style="padding:10px; text-align: left;">
+                        <div class="col">
+                            <textarea class="form-control" name="furnishedComments" rows="4" cols="60"
+                                      placeholder="Additional comments?"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="container-fluid" style="background-color: rgb(0, 105, 62);">
+                    <div class="row" style="padding: 10px; text-align: left; background-color: rgb(0, 105, 62);">
+                        <div class="col" style="color: white; font-size: 20px; font-family: 'Lexend Deca', sans-serif;">
+                            Average Monthly Utility Bill (Total):
+                        </div>
+                    </div>
+                    <div class="row" style="padding:10px; text-align: left; background-color: rgb(0, 105, 62);">
+                        <div class="col" style="color: white; font-size: 20px; font-family: 'Lexend Deca', sans-serif;">
+                            $<input class="form-control" type="number" name="utility">
+                        </div>
+                    </div>
+                </div>
+                <div class="container-fluid" style="background-color: rgb(18, 49, 43);">
+                    <div class="row" style="padding: 10px; text-align: left; ">
+                        <div class="col" style="color: white; font-size: 20px; font-family: 'Lexend Deca', sans-serif;">
+                            Is there anything else a future tenant should know about this property?
+                        </div>
+                    </div>
+                    <div class="row" style="padding:10px; text-align: left;">
+                        <div class="col" style="color: white; font-size: 20px; font-family: 'Lexend Deca', sans-serif;">
+                            <textarea class="form-control" name="finalThoughts" rows="6" cols="60"
+                                      placeholder="Feel free to leave pros, cons, and tips for future tenants!"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" style="padding: 5px;">
+                    <div class="col-1">
+                        <input type="submit" id="submit" style="color: white;
+                    border-radius: 7px;
+                 background-color:rgb(18, 49, 43);
+                 font-size: 20px;
+                 font-family: 'Lexend Deca', sans-serif;">
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script type="module">
+        $("#clean1").click(function(){
+            $("#clean1").attr("src", "static/Images/star-24-gold.png");
+            $("#clean2").attr("src", "static/Images/star-24-white.png");
+            $("#clean3").attr("src", "static/Images/star-24-white.png");
+            $("#clean4").attr("src", "static/Images/star-24-white.png");
+            $("#clean5").attr("src", "static/Images/star-24-white.png");
+            $("#cleanliness").val("1");
+        });
+        $("#clean2").click(function(){
+            $("#clean1").attr("src", "static/Images/star-24-gold.png");
+            $("#clean2").attr("src", "static/Images/star-24-gold.png");
+            $("#clean3").attr("src", "static/Images/star-24-white.png");
+            $("#clean4").attr("src", "static/Images/star-24-white.png");
+            $("#clean5").attr("src", "static/Images/star-24-white.png");
+            $("#cleanliness").val("2");
+        });
+        $("#clean3").click(function(){
+            $("#clean1").attr("src", "static/Images/star-24-gold.png");
+            $("#clean2").attr("src", "static/Images/star-24-gold.png");
+            $("#clean3").attr("src", "static/Images/star-24-gold.png");
+            $("#clean4").attr("src", "static/Images/star-24-white.png");
+            $("#clean5").attr("src", "static/Images/star-24-white.png");
+            $("#cleanliness").val("3");
+        });
+        $("#clean4").click(function(){
+            $("#clean1").attr("src", "static/Images/star-24-gold.png");
+            $("#clean2").attr("src", "static/Images/star-24-gold.png");
+            $("#clean3").attr("src", "static/Images/star-24-gold.png");
+            $("#clean4").attr("src", "static/Images/star-24-gold.png");
+            $("#clean5").attr("src", "static/Images/star-24-white.png");
+            $("#cleanliness").val("4");
+        });
+        $("#clean5").click(function(){
+            $("#clean1").attr("src", "static/Images/star-24-gold.png");
+            $("#clean2").attr("src", "static/Images/star-24-gold.png");
+            $("#clean3").attr("src", "static/Images/star-24-gold.png");
+            $("#clean4").attr("src", "static/Images/star-24-gold.png");
+            $("#clean5").attr("src", "static/Images/star-24-gold.png");
+            $("#cleanliness").val("5");
+        });
+
+
+        $("#noise1").click(function(){
+            $("#noise1").attr("src", "static/Images/star-24-gold.png");
+            $("#noise2").attr("src", "static/Images/star-24-white.png");
+            $("#noise3").attr("src", "static/Images/star-24-white.png");
+            $("#noise4").attr("src", "static/Images/star-24-white.png");
+            $("#noise5").attr("src", "static/Images/star-24-white.png");
+            $("#noise").val("1");
+        });
+        $("#noise2").click(function(){
+            $("#noise1").attr("src", "static/Images/star-24-gold.png");
+            $("#noise2").attr("src", "static/Images/star-24-gold.png");
+            $("#noise3").attr("src", "static/Images/star-24-white.png");
+            $("#noise4").attr("src", "static/Images/star-24-white.png");
+            $("#noise5").attr("src", "static/Images/star-24-white.png");
+            $("#noise").val("2");
+        });
+        $("#noise3").click(function(){
+            $("#noise1").attr("src", "static/Images/star-24-gold.png");
+            $("#noise2").attr("src", "static/Images/star-24-gold.png");
+            $("#noise3").attr("src", "static/Images/star-24-gold.png");
+            $("#noise4").attr("src", "static/Images/star-24-white.png");
+            $("#noise5").attr("src", "static/Images/star-24-white.png");
+            $("#noise").val("3");
+        });
+        $("#noise4").click(function(){
+            $("#noise1").attr("src", "static/Images/star-24-gold.png");
+            $("#noise2").attr("src", "static/Images/star-24-gold.png");
+            $("#noise3").attr("src", "static/Images/star-24-gold.png");
+            $("#noise4").attr("src", "static/Images/star-24-gold.png");
+            $("#noise5").attr("src", "static/Images/star-24-white.png");
+            $("#noise").val("4");
+        });
+        $("#noise5").click(function(){
+            $("#noise1").attr("src", "static/Images/star-24-gold.png");
+            $("#noise2").attr("src", "static/Images/star-24-gold.png");
+            $("#noise3").attr("src", "static/Images/star-24-gold.png");
+            $("#noise4").attr("src", "static/Images/star-24-gold.png");
+            $("#noise5").attr("src", "static/Images/star-24-gold.png");
+            $("#noise").val("5");
+        });
+
+
+        $("#responsive1").click(function(){
+            $("#responsive1").attr("src", "static/Images/star-24-gold.png");
+            $("#responsive2").attr("src", "static/Images/star-24-white.png");
+            $("#responsive3").attr("src", "static/Images/star-24-white.png");
+            $("#responsive4").attr("src", "static/Images/star-24-white.png");
+            $("#responsive5").attr("src", "static/Images/star-24-white.png");
+            $("#responsive").val("1");
+        });
+        $("#responsive2").click(function(){
+            $("#responsive1").attr("src", "static/Images/star-24-gold.png");
+            $("#responsive2").attr("src", "static/Images/star-24-gold.png");
+            $("#responsive3").attr("src", "static/Images/star-24-white.png");
+            $("#responsive4").attr("src", "static/Images/star-24-white.png");
+            $("#responsive5").attr("src", "static/Images/star-24-white.png");
+            $("#responsive").val("2");
+        });
+        $("#responsive3").click(function(){
+            $("#responsive1").attr("src", "static/Images/star-24-gold.png");
+            $("#responsive2").attr("src", "static/Images/star-24-gold.png");
+            $("#responsive3").attr("src", "static/Images/star-24-gold.png");
+            $("#responsive4").attr("src", "static/Images/star-24-white.png");
+            $("#responsive5").attr("src", "static/Images/star-24-white.png");
+            $("#responsive").val("3");
+        });
+        $("#responsive4").click(function(){
+            $("#responsive1").attr("src", "static/Images/star-24-gold.png");
+            $("#responsive2").attr("src", "static/Images/star-24-gold.png");
+            $("#responsive3").attr("src", "static/Images/star-24-gold.png");
+            $("#responsive4").attr("src", "static/Images/star-24-gold.png");
+            $("#responsive5").attr("src", "static/Images/star-24-white.png");
+            $("#responsive").val("4");
+        });
+        $("#responsive5").click(function(){
+            $("#responsive1").attr("src", "static/Images/star-24-gold.png");
+            $("#responsive2").attr("src", "static/Images/star-24-gold.png");
+            $("#responsive3").attr("src", "static/Images/star-24-gold.png");
+            $("#responsive4").attr("src", "static/Images/star-24-gold.png");
+            $("#responsive5").attr("src", "static/Images/star-24-gold.png");
+            $("#responsive").val("5");
+        });
+
+
+
+        $("#landlord1").click(function(){
+            $("#landlord1").attr("src", "static/Images/star-24-gold.png");
+            $("#landlord2").attr("src", "static/Images/star-24-white.png");
+            $("#landlord3").attr("src", "static/Images/star-24-white.png");
+            $("#landlord4").attr("src", "static/Images/star-24-white.png");
+            $("#landlord5").attr("src", "static/Images/star-24-white.png");
+            $("#landlord").val("1");
+        });
+        $("#landlord2").click(function(){
+            $("#landlord1").attr("src", "static/Images/star-24-gold.png");
+            $("#landlord2").attr("src", "static/Images/star-24-gold.png");
+            $("#landlord3").attr("src", "static/Images/star-24-white.png");
+            $("#landlord4").attr("src", "static/Images/star-24-white.png");
+            $("#landlord5").attr("src", "static/Images/star-24-white.png");
+            $("#landlord").val("2");
+        });
+        $("#landlord3").click(function(){
+            $("#landlord1").attr("src", "static/Images/star-24-gold.png");
+            $("#landlord2").attr("src", "static/Images/star-24-gold.png");
+            $("#landlord3").attr("src", "static/Images/star-24-gold.png");
+            $("#landlord4").attr("src", "static/Images/star-24-white.png");
+            $("#landlord5").attr("src", "static/Images/star-24-white.png");
+            $("#landlord").val("3");
+        });
+        $("#landlord4").click(function(){
+            $("#landlord1").attr("src", "static/Images/star-24-gold.png");
+            $("#landlord2").attr("src", "static/Images/star-24-gold.png");
+            $("#landlord3").attr("src", "static/Images/star-24-gold.png");
+            $("#landlord4").attr("src", "static/Images/star-24-gold.png");
+            $("#landlord5").attr("src", "static/Images/star-24-white.png");
+            $("#landlord").val("4");
+        });
+        $("#landlord5").click(function(){
+            $("#landlord1").attr("src", "static/Images/star-24-gold.png");
+            $("#landlord2").attr("src", "static/Images/star-24-gold.png");
+            $("#landlord3").attr("src", "static/Images/star-24-gold.png");
+            $("#landlord4").attr("src", "static/Images/star-24-gold.png");
+            $("#landlord5").attr("src", "static/Images/star-24-gold.png");
+            $("#landlord").val("5");
+        });
+
+
+        $("#pest1").click(function(){
+            $("#pest1").attr("src", "static/Images/star-24-gold.png");
+            $("#pest2").attr("src", "static/Images/star-24-white.png");
+            $("#pest3").attr("src", "static/Images/star-24-white.png");
+            $("#pest4").attr("src", "static/Images/star-24-white.png");
+            $("#pest5").attr("src", "static/Images/star-24-white.png");
+            $("#pest").val("1");
+        });
+        $("#pest2").click(function(){
+            $("#pest1").attr("src", "static/Images/star-24-gold.png");
+            $("#pest2").attr("src", "static/Images/star-24-gold.png");
+            $("#pest3").attr("src", "static/Images/star-24-white.png");
+            $("#pest4").attr("src", "static/Images/star-24-white.png");
+            $("#pest5").attr("src", "static/Images/star-24-white.png");
+            $("#pest").val("2");
+        });
+        $("#pest3").click(function(){
+            $("#pest1").attr("src", "static/Images/star-24-gold.png");
+            $("#pest2").attr("src", "static/Images/star-24-gold.png");
+            $("#pest3").attr("src", "static/Images/star-24-gold.png");
+            $("#pest4").attr("src", "static/Images/star-24-white.png");
+            $("#pest5").attr("src", "static/Images/star-24-white.png");
+            $("#pest").val("3");
+        });
+        $("#pest4").click(function(){
+            $("#pest1").attr("src", "static/Images/star-24-gold.png");
+            $("#pest2").attr("src", "static/Images/star-24-gold.png");
+            $("#pest3").attr("src", "static/Images/star-24-gold.png");
+            $("#pest4").attr("src", "static/Images/star-24-gold.png");
+            $("#pest5").attr("src", "static/Images/star-24-white.png");
+            $("#pest").val("4");
+        });
+        $("#pest5").click(function(){
+            $("#pest1").attr("src", "static/Images/star-24-gold.png");
+            $("#pest2").attr("src", "static/Images/star-24-gold.png");
+            $("#pest3").attr("src", "static/Images/star-24-gold.png");
+            $("#pest4").attr("src", "static/Images/star-24-gold.png");
+            $("#pest5").attr("src", "static/Images/star-24-gold.png");
+            $("#pest").val("5");
+        });
+
+        $("#safety1").click(function(){
+            $("#safety1").attr("src", "static/Images/star-24-gold.png");
+            $("#safety2").attr("src", "static/Images/star-24-white.png");
+            $("#safety3").attr("src", "static/Images/star-24-white.png");
+            $("#safety4").attr("src", "static/Images/star-24-white.png");
+            $("#safety5").attr("src", "static/Images/star-24-white.png");
+            $("#safety").val("1");
+        });
+        $("#safety2").click(function(){
+            $("#safety1").attr("src", "static/Images/star-24-gold.png");
+            $("#safety2").attr("src", "static/Images/star-24-gold.png");
+            $("#safety3").attr("src", "static/Images/star-24-white.png");
+            $("#safety4").attr("src", "static/Images/star-24-white.png");
+            $("#safety5").attr("src", "static/Images/star-24-white.png");
+            $("#safety").val("2");
+        });
+        $("#safety3").click(function(){
+            $("#safety1").attr("src", "static/Images/star-24-gold.png");
+            $("#safety2").attr("src", "static/Images/star-24-gold.png");
+            $("#safety3").attr("src", "static/Images/star-24-gold.png");
+            $("#safety4").attr("src", "static/Images/star-24-white.png");
+            $("#safety5").attr("src", "static/Images/star-24-white.png");
+            $("#safety").val("3");
+        });
+        $("#safety4").click(function(){
+            $("#safety1").attr("src", "static/Images/star-24-gold.png");
+            $("#safety2").attr("src", "static/Images/star-24-gold.png");
+            $("#safety3").attr("src", "static/Images/star-24-gold.png");
+            $("#safety4").attr("src", "static/Images/star-24-gold.png");
+            $("#safety5").attr("src", "static/Images/star-24-white.png");
+            $("#safety").val("4");
+        });
+        $("#safety5").click(function(){
+            $("#safety1").attr("src", "static/Images/star-24-gold.png");
+            $("#safety2").attr("src", "static/Images/star-24-gold.png");
+            $("#safety3").attr("src", "static/Images/star-24-gold.png");
+            $("#safety4").attr("src", "static/Images/star-24-gold.png");
+            $("#safety5").attr("src", "static/Images/star-24-gold.png");
+            $("#safety").val("5");
+        });
+
+
+        $("#appliance1").click(function(){
+            $("#appliance1").attr("src", "static/Images/star-24-gold.png");
+            $("#appliance2").attr("src", "static/Images/star-24-white.png");
+            $("#appliance3").attr("src", "static/Images/star-24-white.png");
+            $("#appliance4").attr("src", "static/Images/star-24-white.png");
+            $("#appliance5").attr("src", "static/Images/star-24-white.png");
+            $("#appliance").val("1");
+        });
+        $("#appliance2").click(function(){
+            $("#appliance1").attr("src", "static/Images/star-24-gold.png");
+            $("#appliance2").attr("src", "static/Images/star-24-gold.png");
+            $("#appliance3").attr("src", "static/Images/star-24-white.png");
+            $("#appliance4").attr("src", "static/Images/star-24-white.png");
+            $("#appliance5").attr("src", "static/Images/star-24-white.png");
+            $("#appliance").val("2");
+        });
+        $("#appliance3").click(function(){
+            $("#appliance1").attr("src", "static/Images/star-24-gold.png");
+            $("#appliance2").attr("src", "static/Images/star-24-gold.png");
+            $("#appliance3").attr("src", "static/Images/star-24-gold.png");
+            $("#appliance4").attr("src", "static/Images/star-24-white.png");
+            $("#appliance5").attr("src", "static/Images/star-24-white.png");
+            $("#appliance").val("3");
+        });
+        $("#appliance4").click(function(){
+            $("#appliance1").attr("src", "static/Images/star-24-gold.png");
+            $("#appliance2").attr("src", "static/Images/star-24-gold.png");
+            $("#appliance3").attr("src", "static/Images/star-24-gold.png");
+            $("#appliance4").attr("src", "static/Images/star-24-gold.png");
+            $("#appliance5").attr("src", "static/Images/star-24-white.png");
+            $("#appliance").val("4");
+        });
+        $("#appliance5").click(function(){
+            $("#appliance1").attr("src", "static/Images/star-24-gold.png");
+            $("#appliance2").attr("src", "static/Images/star-24-gold.png");
+            $("#appliance3").attr("src", "static/Images/star-24-gold.png");
+            $("#appliance4").attr("src", "static/Images/star-24-gold.png");
+            $("#appliance5").attr("src", "static/Images/star-24-gold.png");
+            $("#appliance").val("5");
+        });
+
+        $("#transport1").click(function(){
+            $("#transport1").attr("src", "static/Images/star-24-gold.png");
+            $("#transport2").attr("src", "static/Images/star-24-white.png");
+            $("#transport3").attr("src", "static/Images/star-24-white.png");
+            $("#transport4").attr("src", "static/Images/star-24-white.png");
+            $("#transport5").attr("src", "static/Images/star-24-white.png");
+            $("#transport").val("1");
+        });
+        $("#transport2").click(function(){
+            $("#transport1").attr("src", "static/Images/star-24-gold.png");
+            $("#transport2").attr("src", "static/Images/star-24-gold.png");
+            $("#transport3").attr("src", "static/Images/star-24-white.png");
+            $("#transport4").attr("src", "static/Images/star-24-white.png");
+            $("#transport5").attr("src", "static/Images/star-24-white.png");
+            $("#transport").val("2");
+        });
+        $("#transport3").click(function(){
+            $("#transport1").attr("src", "static/Images/star-24-gold.png");
+            $("#transport2").attr("src", "static/Images/star-24-gold.png");
+            $("#transport3").attr("src", "static/Images/star-24-gold.png");
+            $("#transport4").attr("src", "static/Images/star-24-white.png");
+            $("#transport5").attr("src", "static/Images/star-24-white.png");
+            $("#transport").val("3");
+        });
+        $("#transport4").click(function(){
+            $("#transport1").attr("src", "static/Images/star-24-gold.png");
+            $("#transport2").attr("src", "static/Images/star-24-gold.png");
+            $("#transport3").attr("src", "static/Images/star-24-gold.png");
+            $("#transport4").attr("src", "static/Images/star-24-gold.png");
+            $("#transport5").attr("src", "static/Images/star-24-white.png");
+            $("#transport").val("4");
+        });
+        $("#transport5").click(function(){
+            $("#transport1").attr("src", "static/Images/star-24-gold.png");
+            $("#transport2").attr("src", "static/Images/star-24-gold.png");
+            $("#transport3").attr("src", "static/Images/star-24-gold.png");
+            $("#transport4").attr("src", "static/Images/star-24-gold.png");
+            $("#transport5").attr("src", "static/Images/star-24-gold.png");
+            $("#transport").val("5");
+        });
+
+
+        $("#furnished1").click(function(){
+            $("#furnished1").attr("src", "static/Images/star-24-gold.png");
+            $("#furnished2").attr("src", "static/Images/star-24-white.png");
+            $("#furnished3").attr("src", "static/Images/star-24-white.png");
+            $("#furnished4").attr("src", "static/Images/star-24-white.png");
+            $("#furnished5").attr("src", "static/Images/star-24-white.png");
+            $("#furnished").val("1");
+        });
+        $("#furnished2").click(function(){
+            $("#furnished1").attr("src", "static/Images/star-24-gold.png");
+            $("#furnished2").attr("src", "static/Images/star-24-gold.png");
+            $("#furnished3").attr("src", "static/Images/star-24-white.png");
+            $("#furnished4").attr("src", "static/Images/star-24-white.png");
+            $("#furnished5").attr("src", "static/Images/star-24-white.png");
+            $("#furnished").val("2");
+        });
+        $("#furnished3").click(function(){
+            $("#furnished1").attr("src", "static/Images/star-24-gold.png");
+            $("#furnished2").attr("src", "static/Images/star-24-gold.png");
+            $("#furnished3").attr("src", "static/Images/star-24-gold.png");
+            $("#furnished4").attr("src", "static/Images/star-24-white.png");
+            $("#furnished5").attr("src", "static/Images/star-24-white.png");
+            $("#furnished").val("3");
+        });
+        $("#furnished4").click(function(){
+            $("#furnished1").attr("src", "static/Images/star-24-gold.png");
+            $("#furnished2").attr("src", "static/Images/star-24-gold.png");
+            $("#furnished3").attr("src", "static/Images/star-24-gold.png");
+            $("#furnished4").attr("src", "static/Images/star-24-gold.png");
+            $("#furnished5").attr("src", "static/Images/star-24-white.png");
+            $("#furnished").val("4");
+        });
+        $("#furnished5").click(function(){
+            $("#furnished1").attr("src", "static/Images/star-24-gold.png");
+            $("#furnished2").attr("src", "static/Images/star-24-gold.png");
+            $("#furnished3").attr("src", "static/Images/star-24-gold.png");
+            $("#furnished4").attr("src", "static/Images/star-24-gold.png");
+            $("#furnished5").attr("src", "static/Images/star-24-gold.png");
+            $("#furnished").val("5");
+        });
+
+        $("#transportYes").click(function(){
+            $("#transportAvailable1").show();
+            $("#transportAvailable2").show();
+        });
+        $("#transportNo").click(function(){
+            $("#transportAvailable1").hide();
+            $("#transportAvailable2").hide();
+            $("#transport1").attr("src", "static/Images/star-24-white.png");
+            $("#transport2").attr("src", "static/Images/star-24-white.png");
+            $("#transport3").attr("src", "static/Images/star-24-white.png");
+            $("#transport4").attr("src", "static/Images/star-24-white.png");
+            $("#transport5").attr("src", "static/Images/star-24-white.png");
+            $("#transport").val("")
+        });
+
+        $("#furnishedYes").click(function(){
+            $("#furnitureQuality1").show();
+            $("#furnitureQuality2").show();
+        });
+        $("#furnishedNo").click(function(){
+            $("#furnitureQuality1").hide();
+            $("#furnitureQuality2").hide();
+            $("#furnished1").attr("src", "static/Images/star-24-white.png");
+            $("#furnished2").attr("src", "static/Images/star-24-white.png");
+            $("#furnished3").attr("src", "static/Images/star-24-white.png");
+            $("#furnished4").attr("src", "static/Images/star-24-white.png");
+            $("#furnished5").attr("src", "static/Images/star-24-white.png");
+            $("#furnished").val("");
+        });
+        $("#submit").hover(function(){
+            $("#submit").css("background-color", "rgb(0, 105, 62)");
+        },
+        function(){
+            $("#submit").css("background-color", "rgb(18, 49, 43)");
+        });
+        $("#submit").mousedown(function(){
+            $("#submit").css("background-color", "rgb(0, 105, 62)");
+        });
+        $("#submit").mouseup(function(){
+            $("#submit").css("background-color", "rgb(18, 49, 43)");
+        });
+    </script>
+</body>
+</html>

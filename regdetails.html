@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <title>Registrar's Office: Class Details</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel=
+        "stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+      <div class="container bg-primary"><center><h1>Registrar's Office: Class Details</h1></center></div> 
+        <div class="container"><h2>Class Details (class id {{classid}})</h2>
+        <strong>Course Id:</strong> {{details1[0]}}<br>
+        <strong>Days:</strong> {{details1[1]}}<br>
+        <strong>Start time:</strong> {{details1[2]}}<br>
+        <strong>End time:</strong> {{details1[3]}}<br>
+        <strong>Building:</strong> {{details1[4]}}<br>
+        <strong>Room:</strong> {{details1[5]}}
+        <hr style="margin-bottom: 0em">
+      </div>
+
+      <div class="container">
+        <h2>Course Details (course id {{courseid}})</h2>
+        {% for detail in details2: %}
+          <strong>Dept and Number: </strong> {{detail}}<br>
+        {% endfor %}
+
+        <strong>Area:</strong> {{details3[0]}}<br>
+        <strong>Title:</strong> {{details3[1]}}<br>
+        <strong>Description:</strong> {{details3[2]}}<br>
+        <strong>Prerequisites:</strong> {{details3[3]}}<br>
+        {% for prof in details4 %}
+          <strong>Professor:</strong> {{prof}}<br>
+        {% endfor %}
+
+        <hr>
+        </div>
+        <div class="container bg-info">
+          <center>
+           {% include 'footer.html' %}
+          </center>
+        </div>
+    </body>
+    </html>
