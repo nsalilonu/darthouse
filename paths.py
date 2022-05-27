@@ -114,7 +114,11 @@ def createReview():
         print(e, file=stderr)
         exit(1)
   
-
+@app.route('/findDetails', methods=['GET'])
+def findDetails():
+    html = render_template("findDetails.html")
+    response = make_response(html)
+    return response
 
 
 
