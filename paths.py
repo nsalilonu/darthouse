@@ -136,53 +136,59 @@ def getContent():
         cursor = connection.cursor()
         statement = ""
         if (address == "" or address == None):
-            print("No data, sending everything...")
-            statement = "SELECT address, start_date, end_date, cleanliness, noise, responsive, landlord, pest, \
-                safety, appliance, transport, furnished, utility FROM reviews  ORDER BY address"
+            # statement = "SELECT address, start_date, end_date, cleanliness, noise, responsive, landlord, pest, \
+            #     safety, appliance, transport, furnished, utility FROM reviews  ORDER BY address"
+            statement = "SELECT DISTINCT address FROM reviews ORDER BY address"
         else:
-            print("Specific address, sending address")
-            statement = "SELECT address, start_date, end_date, cleanliness, noise, responsive, landlord, pest, \
-                safety, appliance, transport, furnished FROM reviews WHERE address LIKE \'"+address+"%\'\
-                ORDER BY address"
+            # statement = "SELECT address, start_date, end_date, cleanliness, noise, responsive, landlord, pest, \
+            #     safety, appliance, transport, furnished FROM reviews WHERE address LIKE \'"+address+"%\'\
+            #     ORDER BY address"
+            statement = "SELECT DISTINCT address FROM reviews WHERE address LIKE \'"+address+"%\' ORDER BY address"
             
-        print("Statement to be executed: "+statement)
-        data = cursor.execute(statement).fetchall()
+        addresses = cursor.execute(statement).fetchall()
         html = ""
         color1="background-color: rgb(0, 105, 62);"
         color2="background-color: rgb(18, 49, 43);"
         color = color1
-        
-        for row in data:
+
+        for address in addresses:
+            statement = "SELECT cleanliness, noise, responsive, landlord, pest, \
+                safety, appliance, transport, furnished FROM reviews WHERE address=\'"+address[0]+"\'\
+                ORDER BY address"
+            cleanliness, noise, responsive, landlord, pest, safety, appliance, transport, furnished = 0, 0, 0, 0, 0, 0, 0, 0, 0
+            addressDetails = cursor.execute(statement).fetchall()
             rating = 0
             total = 0
-            cleanliness, noise, responsive, landlord, pest, safety, appliance, transport, furnished = 0, 0, 0, 0, 0, 0, 0, 0, 0
-            if (row[3] != ""):
-                cleanliness = int(row[3])
-                total += 1
-            if (row[4] != ""):
-                noise = int(row[4])
-                total += 1
-            if (row[5] != ""):
-                responsive = int(row[5])
-                total += 1
-            if (row[6] != ""):    
-                landlord = int(row[6])
-                total += 1
-            if (row[7] != ""):
-                pest = int(row[7])
-                total += 1
-            if (row[8] != ""):
-                safety = int(row[8])
-                total += 1
-            if (row[9] != ""):
-                appliance = int(row[9])
-                total += 1
-            if (row[10] != ""):
-                transport = int(row[10])
-                total += 1
-            if (row[11] != ""):
-                furnished = int(row[11])
-                total += 1
+
+            for details in addressDetails:
+                if (details[0] != ""):
+                    cleanliness += int(details[0])
+                    total += 1
+                if (details[1] != ""):
+                    noise += int(details[1])
+                    total += 1
+                if (details[2] != ""):
+                    responsive += int(details[2])
+                    total += 1
+                if (details[3] != ""):    
+                    landlord += int(details[3])
+                    total += 1
+                if (details[4] != ""):
+                    pest += int(details[4])
+                    total += 1
+                if (details[5] != ""):
+                    safety += int(details[5])
+                    total += 1
+                if (details[6] != ""):
+                    appliance += int(details[6])
+                    total += 1
+                if (details[7] != ""):
+                    transport += int(details[7])
+                    total += 1
+                if (details[8] != ""):
+                    furnished += int(details[8])
+                    total += 1
+
             sum = cleanliness + noise + responsive + landlord + pest + safety + appliance + transport + furnished
             if (sum == 0):
                 rating = 0
@@ -190,12 +196,12 @@ def getContent():
             else:
                 rating = sum/total
                 rating = round(rating, 1)
-            rating = str(rating)
-            
+                rating = str(rating)
+                
 
             html += "   <div class=\"row\" style=\""+color+"\">\
                             <div class=\"col-8\" style=\"color: white; font-size: 20px; font-family: \'Lexend Deca\', sans-serif;\">"+\
-                                row[0]+\
+                                address[0]+\
                             "</div>\
                             <div class=\"col-4\" style=\"color: white; font-size: 20px; font-family: \'Lexend Deca\', sans-serif;\">"\
                                 +rating+\
@@ -206,7 +212,7 @@ def getContent():
                 color = color2
             else:
                 color = color1
-            
+        
         cursor.close()
         connection.close()
 
