@@ -36,5 +36,83 @@
                 </li>
             </ul>
         </nav>
+
+        <div class="container-fluid" style="padding: 10px;">
+            <div class="form-outline">
+                <input type="search" id="address" class="form-control" placeholder="Address of property">
+            </div>
+        </div>
+        <div class="container-fluid" style="padding: 10px; background-color:rgb(18, 49, 43);">
+            <div class="row">
+                <div class="col-8" style="color: white; font-size: 20px; font-family: 'Lexend Deca', sans-serif;">
+                    Address (Click for more details)
+                </div>
+                <div class="col-4" style="color: white; font-size: 20px; font-family: 'Lexend Deca', sans-serif;">
+                    Overall Rating
+                </div>
+            </div>
+        </div>
+        <div class="container-fluid" id="results" style="padding: 10px;">
+        </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', setup);
+            let request = null;
+        
+            // Sets up the event listeners, waits for input, then calles getResults
+            function setup() {
+                console.log("Setting up!");
+                let address = document.getElementById("address");
+        
+                address.addEventListener('input', getResults);
+        
+                let url = "/getContent?address=";
+                request = new XMLHttpRequest();
+                request.onreadystatechange = processReadyStateChange;
+                request.open('GET', url);
+                request.send();
+            }
+        
+            function getResults() {
+                console.log("Getting results");
+                let address = document.getElementById("address").value;
+        
+                address = encodeURIComponent(address);
+                let url = "/getContent?address=" + address;
+                
+                if (request !== null) 
+                    request.abort();
+        
+                request = new XMLHttpRequest();
+                request.onreadystatechange = processReadyStateChange;
+                request.open('GET', url);
+                request.send();
+            }
+        
+            function processReadyStateChange() {
+                const STATE_UNINITIALIZED = 0;
+                const STATE_LOADING = 1;
+                const STATE_LOADED = 2;
+                const STATE_INTERACTIVE = 3;
+                const STATE_COMPLETED = 4;
+                const STATUS_OK = 200;
+
+                if (this.readyState !== STATE_COMPLETED) {
+                    console.log("Not completed")
+                    return;
+                }
+                if (this.status !== STATUS_OK) {
+                    console.log("Not status OK"); 
+                    return;
+                }
+                if (this.responseText === null) {
+                    console.log("No data")
+                    alert("AJAX error: No data received.");
+                    return;
+                }
+                    let results = document.getElementById("results");
+                    results.innerHTML = this.responseText;
+            }
+        </script>
     </body>
     </html>
