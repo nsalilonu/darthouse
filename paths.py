@@ -5,6 +5,7 @@ from flask import Flask, render_template, request, make_response, redirect, url_
 from sys import argv, exit, stderr
 import sqlite3
 import uuid
+import urllib.parse
 
 #-----------------------------------------------------------------------
 
@@ -123,7 +124,6 @@ def findDetails():
 @app.route('/getContent', methods=['GET'])
 def getContent():
     try:
-        print("Getting content")
         address = request.args.get('address')
         DATABASE_NAME = "darthouseSQLite.db"
             
@@ -147,11 +147,12 @@ def getContent():
             
         addresses = cursor.execute(statement).fetchall()
         html = ""
-        color1="background-color: rgb(0, 105, 62);"
-        color2="background-color: rgb(18, 49, 43);"
+        color1 = "background-color: rgb(0, 105, 62);"
+        color2 = "background-color: rgb(18, 49, 43);"
         color = color1
 
         for address in addresses:
+            addressURL = urllib.parse.quote(address[0])
             statement = "SELECT cleanliness, noise, responsive, landlord, pest, \
                 safety, appliance, transport, furnished FROM reviews WHERE address=\'"+address[0]+"\'\
                 ORDER BY address"
@@ -197,12 +198,13 @@ def getContent():
                 rating = sum/total
                 rating = round(rating, 1)
                 rating = str(rating)
+                ratingURL = urllib.parse.quote(rating)
                 
 
             html += "   <div class=\"row\" style=\""+color+"\">\
-                            <div class=\"col-8\" style=\"color: white; font-size: 20px; font-family: \'Lexend Deca\', sans-serif;\">"+\
-                                address[0]+\
-                            "</div>\
+                            <div class=\"col-8\" style=\"color: white; font-size: 20px; font-family: \'Lexend Deca\', sans-serif;\">\
+                                <a href=\"./findMoreDetails?address="+addressURL+"&rating="+ratingURL+"\">"+address[0]+"</a>\
+                            </div>\
                             <div class=\"col-4\" style=\"color: white; font-size: 20px; font-family: \'Lexend Deca\', sans-serif;\">"\
                                 +rating+\
                             "<img src=\"static/Images/star-24-gold.png\" style=\"height: 15px; width: 15px; padding-bottom: 4px; padding-left: 2px;\">"\
@@ -218,6 +220,108 @@ def getContent():
 
         response = make_response(html)
         return response
+
+    except Exception as e:
+        print(e, file=stderr)
+        exit(1)
+
+    except sqlite3.OperationalError as e:
+        print(e, file=stderr)
+        exit(1)
+
+@app.route('/findMoreDetails', methods=['GET'])
+def findMoreDetails():
+    try:
+        address = request.args.get('address')
+        totalRating = request.args.get('rating')
+        DATABASE_NAME = "darthouseSQLite.db"
+            
+        if not path.isfile(DATABASE_NAME):
+            print(argv[0] + ": Database not found", file=stderr)
+            exit(1)
+
+
+        connection = sqlite3.connect(DATABASE_NAME)
+        cursor = connection.cursor()
+        statement = "SELECT * FROM reviews WHERE address=\'"+address+"\' "
+        reviews = cursor.execute(statement).fetchall()
+        color1 = "background-color: rgb(0, 105, 62);"
+        color2 = "background-color: rgb(18, 49, 43);"
+        color = color1
+        html = ""
+        rating = 0
+        sum = 0
+        total = 0
+
+        for review in reviews:
+            rating = 0
+            sum = 0
+            total = 0
+            cleanliness, noise, responsive, landlord, pest, safety, appliance, transport, furnished = 0, 0, 0, 0, 0, 0, 0, 0, 0
+            if (review[4] != ""):
+                cleanliness += int(review[4])
+                total += 1
+            if (review[6] != ""):
+                noise += int(review[6])
+                total += 1
+            if (review[8] != ""):
+                responsive += int(review[8])
+                total += 1
+            if (review[10] != ""):    
+                landlord += int(review[10])
+                total += 1
+            if (review[12] != ""):
+                pest += int(review[12])
+                total += 1
+            if (review[14] != ""):
+                safety += int(review[14])
+                total += 1
+            if (review[16] != ""):
+                appliance += int(review[16])
+                total += 1
+            if (review[19] != ""):
+                transport += int(review[19])
+                total += 1
+            if (review[22] != ""):
+                furnished += int(review[22])
+                total += 1
+
+            sum = cleanliness + noise + responsive + landlord + pest + safety + appliance + transport + furnished
+            if (sum == 0):
+                rating = 0
+                continue
+            else:
+                rating = sum/total
+                rating = round(rating, 1)
+                rating = str(rating)
+                
+
+
+            html += "<div class=\"row\" style=\""+color+" padding: 10px; color: white; font-size: 40px; font-family: \'Lexend Deca\', sans-serif;\">\
+                        <div class=\"col\">\
+                    <div class=\"row\" style=\""+color+" padding: 10px;\">\
+                            <div class=\"col-8\" style=\"color: white; font-size: 20px; font-family: \'Lexend Deca\', sans-serif;\">\
+                                Leasing Period: "+review[2]+" - "+review[3]+"\
+                            </div>\
+                            <div class=\"col-4\" style=\"color: white; font-size: 20px; font-family: \'Lexend Deca\', sans-serif;\">\
+                                Overall Rating: "+rating+"\
+                            <img src=\"static/Images/star-24-gold.png\" style=\"height: 15px; width: 15px; padding-bottom: 4px; padding-left: 2px;\">"\
+                            "</div>\
+                    </div>\
+                    <div class=\"row\" style=\""+color+" padding: 10px;\">\
+                        <div class=\"col\" style=\"color: white; font-size: 20px; font-family: \'Lexend Deca\', sans-serif;\">\
+                                Cleanliness rating: "+str(cleanliness)+"\
+                                    <img src=\"static/Images/star-24-gold.png\" style=\"height: 15px; width: 15px; padding-bottom: 4px; padding-left: 2px;\">\
+                                    <br><br>\
+                                Comments: <br>"+review[5]+"\
+                        </div>\
+                    </div>"
+
+            if (color == color1):
+                color = color2
+            else:
+                color = color1
+
 
     except Exception as e:
         print(e, file=stderr)
