@@ -32,7 +32,35 @@ def about():
     response = make_response(html)
     return response
 
+@app.route('/getAddresses', methods=['GET'])
+def getAddresses():
+    try:
+        DATABASE_NAME = "darthouseSQLite.db"
+            
+        if not path.isfile(DATABASE_NAME):
+            print(argv[0] + ": Database not found", file=stderr)
+            exit(1)
 
+
+        connection = sqlite3.connect(DATABASE_NAME)
+        cursor = connection.cursor()
+        statement = "SELECT DISTINCT address FROM reviews"
+        addresses = cursor.execute(statement).fetchall()
+        addressString = ""
+        for address in addresses:
+            addressString += address[0] + ", "
+        
+        addressString = addressString[0:-2]
+        response = make_response(addressString)
+        return response
+
+    except Exception as e:
+        print(e, file=stderr)
+        exit(1)
+
+    except sqlite3.OperationalError as e:
+        print(e, file=stderr)
+        exit(1)
 
 @app.route('/createReview', methods=['GET'])
 def createReview():
@@ -57,19 +85,23 @@ def createReview():
         safetyComments = request.args.get('safetyComments')
         appliance = request.args.get('appliance')
         applianceComments = request.args.get('applianceComments')
-        transportBool = request.args.get('transportBool')
-        if (transportBool == "on"):
-            transportBool = "1"
-        else:
-            transportBool = "0"
+        
         transport = request.args.get("transport")
-        transportComments = request.args.get("transportComments")
-        furnishedBool = request.args.get("furnishedBool")
-        if (furnishedBool == "on"):
-            furnishedBool = "1"
+        transportBool = ""
+        if (transport == None or transport.strip() == ""):
+            transportBool = "0"
         else:
-            furnishedBool = "0"
+            transportBool = "1"
+        
+        transportComments = request.args.get("transportComments")
+
         furnished = request.args.get("furnished")
+        furnishedBool = ""
+        if (furnished == None or furnished.strip() == ""):
+            furnishedBool = "0"
+        else:
+            furnishedBool = "1"
+
         furnishedComments = request.args.get("furnishedComments")
         utility = request.args.get("utility")
         finalThoughts = request.args.get("finalThoughts")
@@ -86,8 +118,8 @@ def createReview():
         inputData = "INSERT INTO reviews VALUES (\""+requestId+"\", \""+address+"\", \""+startDate+"\", \""+endDate+"\", \""\
         +cleanliness+"\", \""+cleanlinessComments+"\", \""+noise+"\", \""+noiseComments+"\", \""+responsive+"\", \""\
         +responsiveComments+"\", \""+landlord+"\", \""+landlordComments+"\", \""+pest+"\", \""+pestComments+"\", \""\
-        +safety+"\", \""+safetyComments+"\", \""+appliance+"\", \""+applianceComments+"\", \""+transportBool+"\", \""\
-        +transport+"\", \""+transportComments+"\", \""+furnishedBool+"\", \""+furnished+"\", \""+furnishedComments+"\", \""\
+        +safety+"\", \""+safetyComments+"\", \""+appliance+"\", \""+applianceComments+"\", "+transportBool+", \""\
+        +transport+"\", \""+transportComments+"\", "+furnishedBool+", \""+furnished+"\", \""+furnishedComments+"\", \""\
         +utility+"\", \""+finalThoughts+"\")"
         print(inputData)
 
@@ -201,9 +233,9 @@ def getContent():
                 ratingURL = urllib.parse.quote(rating)
                 
 
-            html += "   <div class=\"row\" style=\""+color+"\">\
+            html += "<div class=\"row\" style=\""+color+"\">\
                             <div class=\"col-8\" style=\"color: white; font-size: 20px; font-family: \'Lexend Deca\', sans-serif;\">\
-                                <a href=\"./findMoreDetails?address="+addressURL+"&rating="+ratingURL+"\">"+address[0]+"</a>\
+                                <a class=\"nav-link\" style=\"font-family: \'Ruda\', sans-serif; color: white;\" href=\"./findMoreDetails?address="+addressURL+"&rating="+ratingURL+"\">"+address[0]+"</a>\
                             </div>\
                             <div class=\"col-4\" style=\"color: white; font-size: 20px; font-family: \'Lexend Deca\', sans-serif;\">"\
                                 +rating+\
@@ -233,22 +265,74 @@ def getContent():
 def findMoreDetails():
     try:
         address = request.args.get('address')
+        rating = request.args.get('rating')
+        
+        html = render_template("findMoreDetails.html", address=address, rating=rating)
+        response = make_response(html)
+        return response
+
+    except Exception as e:
+        print(e, file=stderr)
+        exit(1)
+
+    except sqlite3.OperationalError as e:
+        print(e, file=stderr)
+        exit(1)
+
+@app.route('/getMoreContent', methods=['GET'])
+def getMoreContent():
+    def dateFormat(date):
+        dateArray = date.split("-")
+        year = dateArray[0]
+        month = dateArray[1]
+        day = dateArray[2]
+        months = {
+            "01": "Jan.",
+            "02": "Feb.",
+            "03": "Mar.",
+            "04": "April",
+            "05": "May",
+            "06": "June",
+            "07": "July",
+            "08": "Aug.",
+            "09": "Sept.",
+            "10": "Oct.",
+            "11": "Nov.",
+            "12": "Dec."
+        }
+        newDate = months.get(month, "undefined")+" "+day+", "+year
+        return newDate 
+    
+    try:
+        address = request.args.get('address')
         totalRating = request.args.get('rating')
+
         DATABASE_NAME = "darthouseSQLite.db"
             
         if not path.isfile(DATABASE_NAME):
             print(argv[0] + ": Database not found", file=stderr)
             exit(1)
 
-
         connection = sqlite3.connect(DATABASE_NAME)
         cursor = connection.cursor()
-        statement = "SELECT * FROM reviews WHERE address=\'"+address+"\' "
+        statement = "SELECT * FROM reviews WHERE address=\'"+address+"\' ORDER BY start_date DESC"
         reviews = cursor.execute(statement).fetchall()
         color1 = "background-color: rgb(0, 105, 62);"
         color2 = "background-color: rgb(18, 49, 43);"
-        color = color1
-        html = ""
+        color = color2
+        reviewNumber = 1
+        details = "<div class=\"container-fluid\">\
+                    <div class=\"row\" style=\"background-color: rgb(0, 105, 62); padding: 10px; color: white; font-size: 60px; font-variant: small-caps;\
+                    font-stretch: ultra-expanded;\
+                    font-weight: bold; font-family: 'Ruda', sans-serif;\">\
+                        <div class=\"col-8\">\
+                            "+address+"\
+                        </div>\
+                        <div class=\"col-4\">\
+                            "+totalRating+"\
+                            <img src=\"static/Images/star-24-gold.png\" style=\"height: 35px; width: 35px; padding-bottom: 4px; padding-left: 2px;\">\
+                        </div>\
+                    </div>"
         rating = 0
         sum = 0
         total = 0
@@ -294,36 +378,156 @@ def findMoreDetails():
                 rating = sum/total
                 rating = round(rating, 1)
                 rating = str(rating)
-                
+
+            # Format date:
+            startDate = dateFormat(review[2])
+            endDate = dateFormat(review[3])
 
 
-            html += "<div class=\"row\" style=\""+color+" padding: 10px; color: white; font-size: 40px; font-family: \'Lexend Deca\', sans-serif;\">\
-                        <div class=\"col\">\
-                    <div class=\"row\" style=\""+color+" padding: 10px;\">\
-                            <div class=\"col-8\" style=\"color: white; font-size: 20px; font-family: \'Lexend Deca\', sans-serif;\">\
-                                Leasing Period: "+review[2]+" - "+review[3]+"\
+            reviewNumber = str(reviewNumber)
+            details += "<div class=\"row\" style=\""+color+" padding: 10px;\">\
+                            <div class=\"col-2\" style=\"color: white; font-family: \'Lexend Deca\', sans-serif;\">\
+                                <img src=\"static/Images/tenant.png\" style=\"height: auto; width: 100px; padding-bottom: 4px; padding-left: 2px;\"><br>\
+                                Review #"+reviewNumber+"\
                             </div>\
-                            <div class=\"col-4\" style=\"color: white; font-size: 20px; font-family: \'Lexend Deca\', sans-serif;\">\
+                            <div class=\"col-6\" style=\"color: white; font-size: 30px; font-family: \'Lexend Deca\', sans-serif;\">\
+                                Leasing Period: "+startDate+" - "+endDate+"\
+                            </div>\
+                            <div class=\"col-4\" style=\"color: white; font-size: 30px; font-family: \'Lexend Deca\', sans-serif;\">\
                                 Overall Rating: "+rating+"\
-                            <img src=\"static/Images/star-24-gold.png\" style=\"height: 15px; width: 15px; padding-bottom: 4px; padding-left: 2px;\">"\
+                            <img src=\"static/Images/star-24-gold.png\" style=\"height: 20px; width: 20px; padding-bottom: 4px; padding-left: 2apx;\">"\
                             "</div>\
                     </div>\
-                    <div class=\"row\" style=\""+color+" padding: 10px;\">\
+                    <div class=\"row\" style=\""+color+" padding: 10px; text-align: left;\">\
                         <div class=\"col\" style=\"color: white; font-size: 20px; font-family: \'Lexend Deca\', sans-serif;\">\
-                                Cleanliness rating: "+str(cleanliness)+"\
-                                    <img src=\"static/Images/star-24-gold.png\" style=\"height: 15px; width: 15px; padding-bottom: 4px; padding-left: 2px;\">\
-                                    <br><br>\
-                                Comments: <br>"+review[5]+"\
+                                Cleanliness: "
+            for i in range(cleanliness):
+                details +=  "<img src=\"static/Images/star-24-gold.png\" style=\"height: 30px; width: 30px; padding-bottom: 4px; padding-left: 2px;\">"
+            
+            details += "    <br>\
+                            Comments: <br>"+review[5]+"<br><br>\
+                        </div>\
+                    </div>\
+                    <div class=\"row\" style=\""+color+" padding: 10px; text-align: left;\">\
+                        <div class=\"col\" style=\"color: white; font-size: 20px; font-family: \'Lexend Deca\', sans-serif;\">\
+                                Noise rating (Lower ratings mean more noisy): "
+            for i in range(noise):
+                details +=  "<img src=\"static/Images/star-24-gold.png\" style=\"height: 30px; width: 30px; padding-bottom: 4px; padding-left: 2px;\">"
+            details += "<br>\
+                                Comments: <br>"+review[7]+"<br><br>\
+                        </div>\
+                    </div>\
+                    <div class=\"row\" style=\""+color+" padding: 10px; text-align: left;\">\
+                        <div class=\"col\" style=\"color: white; font-size: 20px; font-family: \'Lexend Deca\', sans-serif;\">\
+                                Landlord Responsiveness: "
+            for i in range(responsive):
+                details +=  "<img src=\"static/Images/star-24-gold.png\" style=\"height: 30px; width: 30px; padding-bottom: 4px; padding-left: 2px;\">"
+            details +=  "<br>\
+                                Comments: <br>"+review[9]+"<br><br>\
+                        </div>\
+                    </div>\
+                        <div class=\"row\" style=\""+color+" padding: 10px; text-align: left;\">\
+                        <div class=\"col\" style=\"color: white; font-size: 20px; font-family: \'Lexend Deca\', sans-serif;\">\
+                                Overall Landlord Quality - (Friendliness, Flexibility, Reliability, Fairness): "
+            for i in range(landlord):
+                details +=  "<img src=\"static/Images/star-24-gold.png\" style=\"height: 30px; width: 30px; padding-bottom: 4px; padding-left: 2px;\">"
+            details += "<br>\
+                                Comments: <br>"+review[11]+"<br><br>\
+                        </div>\
+                    </div>\
+                        <div class=\"row\" style=\""+color+" padding: 10px; text-align: left;\">\
+                        <div class=\"col\" style=\"color: white; font-size: 20px; font-family: \'Lexend Deca\', sans-serif;\">\
+                                Pest Control: "
+            for i in range(pest):
+                details +=  "<img src=\"static/Images/star-24-gold.png\" style=\"height: 30px; width: 30px; padding-bottom: 4px; padding-left: 2px;\">"
+            details += "<br>\
+                                Comments: <br>"+review[13]+"<br><br>\
+                        </div>\
+                    </div>\
+                        <div class=\"row\" style=\""+color+" padding: 10px; text-align: left;\">\
+                        <div class=\"col\" style=\"color: white; font-size: 20px; font-family: \'Lexend Deca\', sans-serif;\">\
+                                Safety of the Neighborhood: "
+            for i in range(safety):
+                details +=  "<img src=\"static/Images/star-24-gold.png\" style=\"height: 30px; width: 30px; padding-bottom: 4px; padding-left: 2px;\">"
+            details += "<br>\
+                                Comments: <br>"+review[15]+"<br><br>\
+                        </div>\
+                    </div>\
+                    <div class=\"row\" style=\""+color+" padding: 10px; text-align: left;\">\
+                        <div class=\"col\" style=\"color: white; font-size: 20px; font-family: \'Lexend Deca\', sans-serif;\">\
+                                Appliance Quality: "
+            for i in range(appliance):
+                details +=  "<img src=\"static/Images/star-24-gold.png\" style=\"height: 30px; width: 30px; padding-bottom: 4px; padding-left: 2px;\">"
+            details += "<br>\
+                                Comments: <br>"+review[17]+"<br><br>\
+                        </div>\
+                    </div>\
+                    <div class=\"row\" style=\""+color+" padding: 10px; text-align: left;\">\
+                        <div class=\"col\" style=\"color: white; font-size: 20px; font-family: \'Lexend Deca\', sans-serif;\">\
+                                Did you take public transportation or a shuttle service to/from your home?: "
+
+            if (review[18] == 0):
+                details += "No <br><br><br></div></div>"
+            elif (review[18] == 1):
+                details += "Yes\
+                        </div>\
+                    </div>\
+                     <div class=\"row\" style=\""+color+" padding: 10px; text-align: left;\">\
+                        <div class=\"col\" style=\"color: white; font-size: 20px; font-family: \'Lexend Deca\', sans-serif;\">\
+                                Availability of Transportation: "
+                for i in range(transport):
+                    details +=  "<img src=\"static/Images/star-24-gold.png\" style=\"height: 30px; width: 30px; padding-bottom: 4px; padding-left: 2px;\">"
+                details += "<br>\
+                                Comments: <br>"+review[20]+"<br><br>\
                         </div>\
                     </div>"
+            
+            details += "<div class=\"row\" style=\""+color+" padding: 10px; text-align: left;\">\
+                        <div class=\"col\" style=\"color: white; font-size: 20px; font-family: \'Lexend Deca\', sans-serif;\">\
+                                Furnished?: "
+            if (review[21] == 0):
+                details += "No <br><br><br></div></div>"
+            elif (review[21] == 1):
+                details += "Yes\
+                        </div>\
+                    </div>\
+                     <div class=\"row\" style=\""+color+" padding: 10px; text-align: left;\">\
+                        <div class=\"col\" style=\"color: white; font-size: 20px; font-family: \'Lexend Deca\', sans-serif;\">\
+                                Furniture Quality: "
+                for i in range(furnished):
+                    details +=  "<img src=\"static/Images/star-24-gold.png\" style=\"height: 30px; width: 30px; padding-bottom: 4px; padding-left: 2px;\">"
+                details += "<br>\
+                                Comments: <br>"+review[23]+"<br><br>\
+                        </div>\
+                    </div>"
+            
+            details += "<div class=\"row\" style=\""+color+" padding: 10px; text-align: left;\">\
+                            <div class=\"col\" style=\"color: white; font-size: 20px; font-family: \'Lexend Deca\', sans-serif;\">\
+                                    Average Monthly Utility Bill (Total): $"+str(review[24])+"<br><br><br>\
+                            </div>\
+                        </div>\
+                        <div class=\"row\" style=\""+color+" padding: 10px; text-align: left;\">\
+                            <div class=\"col\" style=\"color: white; font-size: 20px; font-family: \'Lexend Deca\', sans-serif;\">\
+                                    Is there anything else a future tenant should know about this property?:<br>\
+                                        "+str(review[25])+"<br><br><br>\
+                            </div>\
+                        </div>"
+
 
             if (color == color1):
                 color = color2
             else:
                 color = color1
 
+            reviewNumber = int(reviewNumber)
+            reviewNumber += 1
+
+        details += "</div>"
+        response = make_response(details)
+        return response
 
     except Exception as e:
+        print("First exception")
         print(e, file=stderr)
         exit(1)
 

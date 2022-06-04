@@ -2,7 +2,7 @@
     <html>
     <head>
         <meta charset="utf-8" name="viewport"/>
-        <title>Darthouse: Find Review</title>
+        <title>Darthouse: Find Review Details</title>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@600&family=Ruda:wght@900&display=swap"
@@ -33,53 +33,25 @@
                 </li>
             </ul>
         </nav>
+        <span id="address" style="display: none;">{{address}}</span>
+        <span id="rating"  style="display: none;">{{rating}}</span>
 
-        <div class="container-fluid" style="padding: 10px;">
-            <div class="form-outline">
-                <input type="search" id="address" class="form-control" placeholder="Address of property">
-            </div>
-        </div>
-        <div class="container-fluid" style="padding: 10px; background-color:rgb(18, 49, 43);">
-            <div class="row">
-                <div class="col-8" style="color: white; font-size: 20px; font-family: 'Lexend Deca', sans-serif;">
-                    Address (Click for more details)
-                </div>
-                <div class="col-4" style="color: white; font-size: 20px; font-family: 'Lexend Deca', sans-serif;">
-                    Overall Rating
-                </div>
-            </div>
-        </div>
-        <div class="container-fluid" id="results" style="padding: 10px;">
+        <div class="container-fluid" id="details">
         </div>
 
         <script>
             document.addEventListener('DOMContentLoaded', setup);
             let request = null;
         
-            // Sets up the event listeners, waits for input, then calles getResults
             function setup() {
                 console.log("Setting up!");
-                let address = document.getElementById("address");
-        
-                address.addEventListener('input', getResults);
-        
-                let url = "/getContent?address=";
-                request = new XMLHttpRequest();
-                request.onreadystatechange = processReadyStateChange;
-                request.open('GET', url);
-                request.send();
-            }
-        
-            function getResults() {
-                console.log("Getting results");
-                let address = document.getElementById("address").value;
-        
+                let address = document.getElementById("address").innerHTML;
+                let rating = document.getElementById("rating").innerHTML;
+
                 address = encodeURIComponent(address);
-                let url = "/getContent?address=" + address;
-                
-                if (request !== null) 
-                    request.abort();
+                rating = encodeURIComponent(rating);
         
+                let url = "/getMoreContent?address="+address+"&rating="+rating;
                 request = new XMLHttpRequest();
                 request.onreadystatechange = processReadyStateChange;
                 request.open('GET', url);
@@ -107,11 +79,11 @@
                     alert("AJAX error: No data received.");
                     return;
                 }
-                    let results = document.getElementById("results");
-                    results.innerHTML = this.responseText;
+                    let details = document.getElementById("details");
+                    details.innerHTML = this.responseText;
             }
         </script>
-        <footer style="background-color:rgb(18, 49, 43);  font-size: 25px; 
+        <footer style="background-color:rgb(18, 49, 43);  font-size: 25px;
         font-family: 'Lexend Deca', sans-serif; text-align: center; color: white;">
             <div class="row">
                 <div class="col">

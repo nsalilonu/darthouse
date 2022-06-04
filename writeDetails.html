@@ -12,15 +12,41 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="icon" type="image/x-icon" href="static/Images/favicon.ico">
     <script src="static/jquery-v.3.6.0.js"></script>
+    <style>
+        .autocomplete-items {
+        position: absolute;
+        border: 1px solid #d4d4d4;
+        border-bottom: none;
+        border-top: none;
+        z-index: 99;
+        /*position the autocomplete items to be the same width as the container:*/
+        top: 100%;
+        left: 0;
+        right: 0;
+        }
+        .autocomplete-items div {
+        padding: 10px;
+        cursor: pointer;
+        background-color: #fff;
+        border-bottom: 1px solid #d4d4d4;
+        }
+        .autocomplete-items div:hover {
+        /*when hovering an item:*/
+        background-color: #e9e9e9;
+        }
+        .autocomplete-active {
+        /*when navigating through the items using the arrow keys:*/
+        background-color: DodgerBlue !important;
+        color: #ffffff;
+        }
+    </style>
 </head>
+
 <body style="background-color: rgb(0, 105, 62); text-align: center; float:center; ">
     <nav class="navbar navbar-expand-sm" style="background-color: rgb(18, 49, 43); padding-left: 5px; padding-right: 5px;">
         <a class="navbar-brand" href="./" style="font-variant: small-caps;
             font-stretch: ultra-expanded;
             font-weight: bold; font-family: 'Ruda', sans-serif; color: white; font-size: 30px;">DartHouse</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse">
-        <span class="navbar-toggler-icon"></span>
-        </button>
         <ul class="navbar-nav mr-auto">
             <li class="nav-item active">
                 <a class="nav-link" style="font-family: 'Ruda', sans-serif; color: white;" href="./">Home <span class="sr-only">(current)</span></a>
@@ -51,13 +77,15 @@
                     </div>
                     <div class="row" style="padding:10px; text-align: left;">
                         <div class="col">
-                            <input class="form-control" type="text"
-                                   name="address"
-                                   style="border:2px solid black;
-                                   border-radius: 5px;
-                                   padding:5px; 
-                                   text-align:left;"
-                                   placeholder="Address of the property" required>
+                            <div class="autocomplete" style="position: relative;">
+                                <input class="form-control" type="text"
+                                    name="address" id="address"
+                                    style="border:2px solid black;
+                                    border-radius: 5px;
+                                    padding:5px; 
+                                    text-align:left;"
+                                    placeholder="Address of the property" required>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -76,7 +104,7 @@
                     <div class="row" style="padding: 10px;">
                         <div class="col">
                             <input class="form-control" type="date"
-                                   name="startDate"
+                                   name="startDate" id="startDate"
                                    style="border:2px solid black;
                            border-radius: 5px;
                            padding:5px;
@@ -93,7 +121,7 @@
                     <div class="row" style="padding: 10px;">
                         <div class="col">
                             <input class="form-control" type="date"
-                                   name="endDate" 
+                                   name="endDate" id="endDate"
                                    style="border:2px solid black;
                            border-radius: 5px;
                            padding:5px;
@@ -129,7 +157,7 @@
                 <div class="container-fluid" style="background-color: rgb(0, 105, 62)">
                     <div class="row" style="padding: 10px; text-align: left;">
                         <div class="col" style="color: white; font-size: 20px; font-family: 'Lexend Deca', sans-serif;">
-                            Noise
+                            Noise (Lower ratings mean more noisy)
                         </div>
                     </div>
                     <div class="row" style="padding:10px; text-align: left;">
@@ -336,7 +364,7 @@
                     </div>
                     <div class="row" style="padding:10px; text-align: left; background-color: rgb(0, 105, 62);">
                         <div class="col" style="color: white; font-size: 20px; font-family: 'Lexend Deca', sans-serif;">
-                            $<input class="form-control" type="number" name="utility">
+                            $<input class="form-control" type="number" name="utility" id="utility">
                         </div>
                     </div>
                 </div>
@@ -353,20 +381,157 @@
                         </div>
                     </div>
                 </div>
-                <div class="row" style="padding: 5px;">
-                    <div class="col-1">
-                        <input type="submit" id="submit" style="color: white;
-                    border-radius: 7px;
-                 background-color:rgb(18, 49, 43);
-                 font-size: 20px;
-                 font-family: 'Lexend Deca', sans-serif;">
-                    </div>
-                </div>
             </div>
         </form>
+        <div class="row" style="padding: 5px;">
+            <div class="col-1">
+                <button id="submit" style="color: white;
+                                        border-radius: 7px;
+                                        background-color:rgb(18, 49, 43);
+                                        font-size: 20px;
+                                        font-family: 'Lexend Deca', sans-serif;">Submit</button>
+            </div>
+        </div>
     </div>
 
     <script type="module">
+        document.addEventListener('DOMContentLoaded', setup);
+            let request = null;
+
+        // Sets up the event listeners, waits for input, then calles getResults
+        function setup() {
+            console.log("Setting up!");
+    
+            let url = "/getAddresses";
+            request = new XMLHttpRequest();
+            request.onreadystatechange = processReadyStateChange;
+            request.open('GET', url);
+            request.send();
+        }
+        
+        function processReadyStateChange() {
+            const STATE_UNINITIALIZED = 0;
+            const STATE_LOADING = 1;
+            const STATE_LOADED = 2;
+            const STATE_INTERACTIVE = 3;
+            const STATE_COMPLETED = 4;
+            const STATUS_OK = 200;
+
+            if (this.readyState !== STATE_COMPLETED) {
+                console.log("Not completed")
+                return;
+            }
+            if (this.status !== STATUS_OK) {
+                console.log("Not status OK"); 
+                return;
+            }
+            if (this.responseText === null) {
+                console.log("No data")
+                alert("AJAX error: No data received.");
+                return;
+            }
+                let addresses = this.responseText.split(", ");
+                autocomplete(document.getElementById("address"), addresses);
+        }
+
+        function autocomplete(inp, arr) {
+            /*the autocomplete function takes two arguments,
+            the text field element and an array of possible autocompleted values:*/
+            var currentFocus;
+            /*execute a function when someone writes in the text field:*/
+            inp.addEventListener("input", function(e) {
+                var a, b, i, val = this.value;
+                /*close any already open lists of autocompleted values*/
+                closeAllLists();
+                if (!val) { return false;}
+                currentFocus = -1;
+                /*create a DIV element that will contain the items (values):*/
+                a = document.createElement("DIV");
+                a.setAttribute("id", this.id + "autocomplete-list");
+                a.setAttribute("class", "autocomplete-items");
+                /*append the DIV element as a child of the autocomplete container:*/
+                this.parentNode.appendChild(a);
+                /*for each item in the array...*/
+                for (i = 0; i < arr.length; i++) {
+                    /*check if the item starts with the same letters as the text field value:*/
+                    if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+                    /*create a DIV element for each matching element:*/
+                    b = document.createElement("DIV");
+                    /*make the matching letters bold:*/
+                    b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
+                    b.innerHTML += arr[i].substr(val.length);
+                    /*insert a input field that will hold the current array item's value:*/
+                    b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+                    /*execute a function when someone clicks on the item value (DIV element):*/
+                        b.addEventListener("click", function(e) {
+                        /*insert the value for the autocomplete text field:*/
+                        inp.value = this.getElementsByTagName("input")[0].value;
+                        /*close the list of autocompleted values,
+                        (or any other open lists of autocompleted values:*/
+                        closeAllLists();
+                    });
+                    a.appendChild(b);
+                    }
+                }
+            });
+            /*execute a function presses a key on the keyboard:*/
+            inp.addEventListener("keydown", function(e) {
+                var x = document.getElementById(this.id + "autocomplete-list");
+                if (x) x = x.getElementsByTagName("div");
+                if (e.keyCode == 40) {
+                    /*If the arrow DOWN key is pressed,
+                    increase the currentFocus variable:*/
+                    currentFocus++;
+                    /*and and make the current item more visible:*/
+                    addActive(x);
+                } else if (e.keyCode == 38) { //up
+                    /*If the arrow UP key is pressed,
+                    decrease the currentFocus variable:*/
+                    currentFocus--;
+                    /*and and make the current item more visible:*/
+                    addActive(x);
+                } else if (e.keyCode == 13) {
+                    /*If the ENTER key is pressed, prevent the form from being submitted,*/
+                    e.preventDefault();
+                    if (currentFocus > -1) {
+                    /*and simulate a click on the "active" item:*/
+                    if (x) x[currentFocus].click();
+                    }
+                }
+            });
+            function addActive(x) {
+                /*a function to classify an item as "active":*/
+                if (!x) return false;
+                /*start by removing the "active" class on all items:*/
+                removeActive(x);
+                if (currentFocus >= x.length) currentFocus = 0;
+                if (currentFocus < 0) currentFocus = (x.length - 1);
+                /*add class "autocomplete-active":*/
+                x[currentFocus].classList.add("autocomplete-active");
+            }
+            function removeActive(x) {
+                /*a function to remove the "active" class from all autocomplete items:*/
+                for (var i = 0; i < x.length; i++) {
+                x[i].classList.remove("autocomplete-active");
+                }
+            }
+            function closeAllLists(elmnt) {
+                /*close all autocomplete lists in the document,
+                except the one passed as an argument:*/
+                var x = document.getElementsByClassName("autocomplete-items");
+                for (var i = 0; i < x.length; i++) {
+                if (elmnt != x[i] && elmnt != inp) {
+                x[i].parentNode.removeChild(x[i]);
+                }
+            }
+            }
+            /*execute a function when someone clicks in the document:*/
+            document.addEventListener("click", function (e) {
+                closeAllLists(e.target);
+            });
+        }
+
+
         $("#clean1").click(function(){
             $("#clean1").attr("src", "static/Images/star-24-gold.png");
             $("#clean2").attr("src", "static/Images/star-24-white.png");
@@ -784,6 +949,74 @@
         $("#submit").mouseup(function(){
             $("#submit").css("background-color", "rgb(18, 49, 43)");
         });
+        $("#submit").click(function() {
+            if ($("#address").val() == undefined || $("#address").val().trim() == "") {
+                alert("Please fill in your address.");
+            }
+            else if ($("#startDate").val() == undefined || $("#startDate").val() == "") {
+                alert("Please fill in the date you started to live at this address.");
+            }
+            else if ($("#endDate").val() == undefined || $("#endDate").val() == "") {
+                alert("Please fill in the date you stopped living at this address, or the current date if you still live there.");
+            }
+            else if ($("#cleanliness").val() == undefined || $("#cleanliness").val() == "") {           
+                alert("Please rate the cleanliness of this property on move-in.");
+            }
+            else if ($("#noise").val() == undefined || $("#noise").val() == "") {    
+                alert("Please rate the overall noise level around this address; a lower rating means a noisier area.");
+            }
+            else if ($("#responsive").val() == undefined || $("#responsive").val() == "") {    
+                alert("Please rate the responsiveness of your landlord.");
+            }
+            else if ($("#landlord").val() == undefined || $("#landlord").val() == "") {    
+                alert("Please rate your landlord while you were living at this address.");
+            }
+            else if ($("#pest").val() == undefined || $("#pest").val() == "") {    
+                alert("Please rate the pest control services at this address.");
+            }
+            else if ($("#safety").val() == undefined || $("#safety").val() == "") {    
+                alert("Please rate the safety of the surrounding neighborhood.");
+            }
+            else if ($("#appliance").val() == undefined || $("#appliance").val() == "") {    
+                alert("Please rate the quality of the appliances at this address.");
+            }
+            else if ($("#transportYes").is(":checked") == false && $("#transportNo").is(":checked") == false) {    
+                alert("Please indicate whether you took public transport or shuttle services when you were living at this address.");
+            }
+            else if ($("#transportYes").is(":checked") && ($("#transport").val() == undefined || $("#transport").val() == "")) {     
+                alert("Please rate the transport services at this address.");  
+            }  
+            else if ($("#furnishedYes").is(":checked") == false && $("#furnishedNo").is(":checked") == false) {    
+                alert("Please indicate whether this property came furnished.");
+            }
+            else if ($("#furnishedYes").is(":checked") && ($("#furnished").val() == undefined || $("#furnished").val() == "")) {    
+                    alert("Please rate the furniture quality at this address.");  
+            }
+            else if ($("#utility").val() == undefined || $("#utility").val().trim() == '') {  
+                alert("Please input the average total monthly utility bill when you were living at this address.");
+            }
+            else {
+                console.log("Submitting form");
+                $("#review").submit();
+            }           
+        });
     </script>
+    <footer style="background-color:rgb(18, 49, 43);  font-size: 25px;
+    font-family: 'Lexend Deca', sans-serif; text-align: center; color: white;">
+        <div class="row">
+            <div class="col">
+                <img class="img-responsive" style="width: 700px;" src="static/Images/footerPicture.png" alt="Happy cartoon people">
+            </div>
+        </div>
+        <div class="row" style="padding: 10px;">
+            <div class="col">Looking for available housing? Check out the housing resources below!</div>
+        </div>
+        <div class="row" style="padding: 10px; font-size: 20px; color: white;">
+            <div class="col"><a href="https://realestate.dartmouth.edu/">Dartmouth Real Estate</a></div>
+        </div>
+        <div class="row" style="padding: 10px; font-size: 20px; color: white;">
+            <div class="col"><a href="https://sites.dartmouth.edu/dartlist/category/housing/">DartList</a></div>
+        </div>
+    </footer>
 </body>
 </html>
