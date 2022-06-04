@@ -3,7 +3,6 @@
 from flask import Flask, render_template, request, make_response
 from sys import exit, stderr
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 import uuid
 import urllib.parse
 
@@ -11,6 +10,8 @@ import urllib.parse
 
 app = Flask(__name__, template_folder = ".")
 DATABASE_NAME = "postgresql://gkxpqzrwjotsih:9b075c957964638c446f351394517675e40f7ae30ee2997a6b72bc5ec0280114@ec2-3-211-221-185.compute-1.amazonaws.com:5432/dbpk5mu96m82v"
+# DATABASE_NAME = "darthouseSQLite.db"
+engine = create_engine(DATABASE_NAME)
 #-----------------------------------------------------------------------
 
 
@@ -37,14 +38,11 @@ def about():
 @app.route('/getAddresses', methods=['GET'])
 def getAddresses():
     try:
-        engine = create_engine(DATABASE_NAME)
-        Session = sessionmaker(bind = engine)
-        session = Session()
-
         statement = "SELECT DISTINCT address FROM reviews"
-        addresses = session.execute(statement).all()
-        # addresses = session.query(Reviews.address).distinct()
-        session.close()
+
+        with engine.connect() as connection:
+            addresses = connection.execute(statement)
+
 
         addressString = ""
         for address in addresses:
@@ -125,10 +123,6 @@ def createReview():
         finalThoughts = request.args.get("finalThoughts")
         finalThoughts = finalThoughts.replace("\'", "''")
 
-        engine = create_engine(DATABASE_NAME)
-        Session = sessionmaker(bind = engine)
-        session = Session()
-
         inputData = "INSERT INTO reviews VALUES (\'"+requestId+"\', \'"+address+"\', \'"+startDate+"\', \'"+endDate+"\', \'"\
         +cleanliness+"\', \'"+cleanlinessComments+"\', \'"+noise+"\', \'"+noiseComments+"\', \'"+responsive+"\', \'"\
         +responsiveComments+"\', \'"+landlord+"\', \'"+landlordComments+"\', \'"+pest+"\', \'"+pestComments+"\', \'"\
@@ -136,12 +130,9 @@ def createReview():
         +transport+"\', \'"+transportComments+"\', "+furnishedBool+", \'"+furnished+"\', \'"+furnishedComments+"\', \'"\
         +utility+"\', \'"+finalThoughts+"\')"
         
-        session.execute(inputData)
-
-        # Commit your changes in the database    
-        session.commit()
-        session.close()
-
+        with engine.connect() as connection:
+            with connection.begin():
+                connection.execute(inputData)
 
         html = render_template("submitted.html")
         response = make_response(html)
@@ -163,22 +154,15 @@ def getContent():
         address = request.args.get('address')
         address = address.replace("\'", "''")
 
-        engine = create_engine(DATABASE_NAME)
-        Session = sessionmaker(bind = engine)
-        session = Session()
 
         statement = ""
         if (address == "" or address == None):
-            # statement = "SELECT address, start_date, end_date, cleanliness, noise, responsive, landlord, pest, \
-            #     safety, appliance, transport, furnished, utility FROM reviews  ORDER BY address"
             statement = "SELECT DISTINCT address FROM reviews ORDER BY address"
         else:
-            # statement = "SELECT address, start_date, end_date, cleanliness, noise, responsive, landlord, pest, \
-            #     safety, appliance, transport, furnished FROM reviews WHERE address LIKE \'"+address+"%\'\
-            #     ORDER BY address"
             statement = "SELECT DISTINCT address FROM reviews WHERE address LIKE \'"+address+"%\' ORDER BY address"
             
-        addresses = session.execute(statement).all()
+        with engine.connect() as connection:
+            addresses = connection.execute(statement)
         html = ""
         color1 = "background-color: rgb(0, 105, 62);"
         color2 = "background-color: rgb(18, 49, 43);"
@@ -191,7 +175,9 @@ def getContent():
                 safety, appliance, transport, furnished FROM reviews WHERE address=\'"+addressFormatted+"\'\
                 ORDER BY address"
             cleanliness, noise, responsive, landlord, pest, safety, appliance, transport, furnished = 0, 0, 0, 0, 0, 0, 0, 0, 0
-            addressDetails = session.execute(statement).all()
+            
+            with engine.connect() as connection:
+                addressDetails = connection.execute(statement)
             rating = 0
             total = 0
 
@@ -249,7 +235,6 @@ def getContent():
             else:
                 color = color1
         
-        session.close()
 
         response = make_response(html)
         return response
@@ -302,12 +287,12 @@ def getMoreContent():
         addressFormatted = address.replace("\'", "''")
         totalRating = request.args.get('rating')
 
-        engine = create_engine(DATABASE_NAME)
-        Session = sessionmaker(bind = engine)
-        session = Session()
 
         statement = "SELECT * FROM reviews WHERE address=\'"+addressFormatted+"\' ORDER BY start_date DESC"
-        reviews = session.execute(statement).all()
+        
+        with engine.connect() as connection: 
+            reviews = connection.execute(statement).all()
+
         color1 = "background-color: rgb(0, 105, 62);"
         color2 = "background-color: rgb(18, 49, 43);"
         color = color2
@@ -513,7 +498,6 @@ def getMoreContent():
             reviewNumber = int(reviewNumber)
             reviewNumber += 1
         
-        session.close()
 
         details += "</div>"
         response = make_response(details)

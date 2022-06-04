@@ -58,7 +58,6 @@
         
             // Sets up the event listeners, waits for input, then calles getResults
             function setup() {
-                console.log("Setting up!");
                 let address = document.getElementById("address");
         
                 address.addEventListener('input', getResults);
@@ -71,7 +70,6 @@
             }
         
             function getResults() {
-                console.log("Getting results");
                 let address = document.getElementById("address").value;
         
                 address = encodeURIComponent(address);
@@ -95,15 +93,12 @@
                 const STATUS_OK = 200;
 
                 if (this.readyState !== STATE_COMPLETED) {
-                    console.log("Not completed")
                     return;
                 }
                 if (this.status !== STATUS_OK) {
-                    console.log("Not status OK"); 
                     return;
                 }
                 if (this.responseText === null) {
-                    console.log("No data")
                     alert("AJAX error: No data received.");
                     return;
                 }
