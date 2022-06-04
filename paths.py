@@ -186,8 +186,9 @@ def getContent():
 
         for address in addresses:
             addressURL = urllib.parse.quote(address[0])
+            addressFormatted = address[0].replace("\'", "''")
             statement = "SELECT cleanliness, noise, responsive, landlord, pest, \
-                safety, appliance, transport, furnished FROM reviews WHERE address=\'"+address[0]+"\'\
+                safety, appliance, transport, furnished FROM reviews WHERE address=\'"+addressFormatted+"\'\
                 ORDER BY address"
             cleanliness, noise, responsive, landlord, pest, safety, appliance, transport, furnished = 0, 0, 0, 0, 0, 0, 0, 0, 0
             addressDetails = session.execute(statement).all()
@@ -261,7 +262,6 @@ def getContent():
 def findMoreDetails():
     try:
         address = request.args.get('address')
-        address = address.replace("\'", "''")
         rating = request.args.get('rating')
         
         html = render_template("findMoreDetails.html", address=address, rating=rating)
@@ -299,14 +299,14 @@ def getMoreContent():
     
     try:
         address = request.args.get('address')
-        address = address.replace("\'", "''")
+        addressFormatted = address.replace("\'", "''")
         totalRating = request.args.get('rating')
 
         engine = create_engine(DATABASE_NAME)
         Session = sessionmaker(bind = engine)
         session = Session()
 
-        statement = "SELECT * FROM reviews WHERE address=\'"+address+"\' ORDER BY start_date DESC"
+        statement = "SELECT * FROM reviews WHERE address=\'"+addressFormatted+"\' ORDER BY start_date DESC"
         reviews = session.execute(statement).all()
         color1 = "background-color: rgb(0, 105, 62);"
         color2 = "background-color: rgb(18, 49, 43);"
