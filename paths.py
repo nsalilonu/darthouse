@@ -1,17 +1,19 @@
 #!/usr/bin/env python
 
-from os import path, remove
-from flask import Flask, render_template, request, make_response, redirect, url_for
-from sys import argv, exit, stderr
-import sqlite3
+from flask import Flask, render_template, request, make_response
+from sys import exit, stderr
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 import uuid
 import urllib.parse
 
 #-----------------------------------------------------------------------
 
 app = Flask(__name__, template_folder = ".")
-
+DATABASE_NAME = "postgresql://gkxpqzrwjotsih:9b075c957964638c446f351394517675e40f7ae30ee2997a6b72bc5ec0280114@ec2-3-211-221-185.compute-1.amazonaws.com:5432/dbpk5mu96m82v"
 #-----------------------------------------------------------------------
+
+
 
 @app.route('/', methods=['GET'])
 @app.route('/index', methods=['GET'])
@@ -35,17 +37,15 @@ def about():
 @app.route('/getAddresses', methods=['GET'])
 def getAddresses():
     try:
-        DATABASE_NAME = "darthouseSQLite.db"
-            
-        if not path.isfile(DATABASE_NAME):
-            print(argv[0] + ": Database not found", file=stderr)
-            exit(1)
+        engine = create_engine(DATABASE_NAME)
+        Session = sessionmaker(bind = engine)
+        session = Session()
 
-
-        connection = sqlite3.connect(DATABASE_NAME)
-        cursor = connection.cursor()
         statement = "SELECT DISTINCT address FROM reviews"
-        addresses = cursor.execute(statement).fetchall()
+        addresses = session.execute(statement).all()
+        # addresses = session.query(Reviews.address).distinct()
+        session.close()
+
         addressString = ""
         for address in addresses:
             addressString += address[0] + ", "
@@ -55,10 +55,6 @@ def getAddresses():
         return response
 
     except Exception as e:
-        print(e, file=stderr)
-        exit(1)
-
-    except sqlite3.OperationalError as e:
         print(e, file=stderr)
         exit(1)
 
@@ -106,44 +102,29 @@ def createReview():
         utility = request.args.get("utility")
         finalThoughts = request.args.get("finalThoughts")
 
-        DATABASE_NAME = "darthouseSQLite.db"
+        engine = create_engine(DATABASE_NAME)
+        Session = sessionmaker(bind = engine)
+        session = Session()
+
+        inputData = "INSERT INTO reviews VALUES (\'"+requestId+"\', \'"+address+"\', \'"+startDate+"\', \'"+endDate+"\', \'"\
+        +cleanliness+"\', \'"+cleanlinessComments+"\', \'"+noise+"\', \'"+noiseComments+"\', \'"+responsive+"\', \'"\
+        +responsiveComments+"\', \'"+landlord+"\', \'"+landlordComments+"\', \'"+pest+"\', \'"+pestComments+"\', \'"\
+        +safety+"\', \'"+safetyComments+"\', \'"+appliance+"\', \'"+applianceComments+"\', "+transportBool+", \'"\
+        +transport+"\', \'"+transportComments+"\', "+furnishedBool+", \'"+furnished+"\', \'"+furnishedComments+"\', \'"\
+        +utility+"\', \'"+finalThoughts+"\')"
         
-        if not path.isfile(DATABASE_NAME):
-            print(argv[0] + ": Database not found", file=stderr)
-            exit(1)
+        session.execute(inputData)
 
-
-        connection = sqlite3.connect(DATABASE_NAME)
-        cursor = connection.cursor()
-        inputData = "INSERT INTO reviews VALUES (\""+requestId+"\", \""+address+"\", \""+startDate+"\", \""+endDate+"\", \""\
-        +cleanliness+"\", \""+cleanlinessComments+"\", \""+noise+"\", \""+noiseComments+"\", \""+responsive+"\", \""\
-        +responsiveComments+"\", \""+landlord+"\", \""+landlordComments+"\", \""+pest+"\", \""+pestComments+"\", \""\
-        +safety+"\", \""+safetyComments+"\", \""+appliance+"\", \""+applianceComments+"\", "+transportBool+", \""\
-        +transport+"\", \""+transportComments+"\", "+furnishedBool+", \""+furnished+"\", \""+furnishedComments+"\", \""\
-        +utility+"\", \""+finalThoughts+"\")"
-        print(inputData)
-
-        cursor.execute(inputData)
-
-        print("Data inserted in the table: ")
-        data=cursor.execute('''SELECT * FROM reviews''')
-        for row in data:
-            print(row)
         # Commit your changes in the database    
-        connection.commit()
-        print("Committed data!")
-          
-        # Closing the connection
-        connection.close()
+        session.commit()
+        session.close()
+
 
         html = render_template("submitted.html")
         response = make_response(html)
         return response
 
     except Exception as e:
-        print(e, file=stderr)
-        exit(1)
-    except sqlite3.OperationalError as e:
         print(e, file=stderr)
         exit(1)
   
@@ -157,15 +138,11 @@ def findDetails():
 def getContent():
     try:
         address = request.args.get('address')
-        DATABASE_NAME = "darthouseSQLite.db"
-            
-        if not path.isfile(DATABASE_NAME):
-            print(argv[0] + ": Database not found", file=stderr)
-            exit(1)
 
+        engine = create_engine(DATABASE_NAME)
+        Session = sessionmaker(bind = engine)
+        session = Session()
 
-        connection = sqlite3.connect(DATABASE_NAME)
-        cursor = connection.cursor()
         statement = ""
         if (address == "" or address == None):
             # statement = "SELECT address, start_date, end_date, cleanliness, noise, responsive, landlord, pest, \
@@ -177,7 +154,7 @@ def getContent():
             #     ORDER BY address"
             statement = "SELECT DISTINCT address FROM reviews WHERE address LIKE \'"+address+"%\' ORDER BY address"
             
-        addresses = cursor.execute(statement).fetchall()
+        addresses = session.execute(statement).all()
         html = ""
         color1 = "background-color: rgb(0, 105, 62);"
         color2 = "background-color: rgb(18, 49, 43);"
@@ -189,7 +166,7 @@ def getContent():
                 safety, appliance, transport, furnished FROM reviews WHERE address=\'"+address[0]+"\'\
                 ORDER BY address"
             cleanliness, noise, responsive, landlord, pest, safety, appliance, transport, furnished = 0, 0, 0, 0, 0, 0, 0, 0, 0
-            addressDetails = cursor.execute(statement).fetchall()
+            addressDetails = session.execute(statement).all()
             rating = 0
             total = 0
 
@@ -247,17 +224,12 @@ def getContent():
             else:
                 color = color1
         
-        cursor.close()
-        connection.close()
+        session.close()
 
         response = make_response(html)
         return response
 
     except Exception as e:
-        print(e, file=stderr)
-        exit(1)
-
-    except sqlite3.OperationalError as e:
         print(e, file=stderr)
         exit(1)
 
@@ -275,9 +247,6 @@ def findMoreDetails():
         print(e, file=stderr)
         exit(1)
 
-    except sqlite3.OperationalError as e:
-        print(e, file=stderr)
-        exit(1)
 
 @app.route('/getMoreContent', methods=['GET'])
 def getMoreContent():
@@ -307,16 +276,12 @@ def getMoreContent():
         address = request.args.get('address')
         totalRating = request.args.get('rating')
 
-        DATABASE_NAME = "darthouseSQLite.db"
-            
-        if not path.isfile(DATABASE_NAME):
-            print(argv[0] + ": Database not found", file=stderr)
-            exit(1)
+        engine = create_engine(DATABASE_NAME)
+        Session = sessionmaker(bind = engine)
+        session = Session()
 
-        connection = sqlite3.connect(DATABASE_NAME)
-        cursor = connection.cursor()
         statement = "SELECT * FROM reviews WHERE address=\'"+address+"\' ORDER BY start_date DESC"
-        reviews = cursor.execute(statement).fetchall()
+        reviews = session.execute(statement).all()
         color1 = "background-color: rgb(0, 105, 62);"
         color2 = "background-color: rgb(18, 49, 43);"
         color = color2
@@ -521,6 +486,8 @@ def getMoreContent():
 
             reviewNumber = int(reviewNumber)
             reviewNumber += 1
+        
+        session.close()
 
         details += "</div>"
         response = make_response(details)
@@ -531,7 +498,4 @@ def getMoreContent():
         print(e, file=stderr)
         exit(1)
 
-    except sqlite3.OperationalError as e:
-        print(e, file=stderr)
-        exit(1)
 
