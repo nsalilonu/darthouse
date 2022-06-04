@@ -64,8 +64,7 @@ def createReview():
         requestId = str(uuid.uuid4())
         address = request.args.get('address')
 
-        address = address.replace("\'", "")
-        address = address.replace("\"", "")
+        address = address.replace("\'", "''")
 
         startDate = request.args.get('startDate')
 
@@ -73,18 +72,33 @@ def createReview():
 
         cleanliness = request.args.get('cleanliness')
         cleanlinessComments = request.args.get('cleanlinessComments')
+        cleanlinessComments = cleanlinessComments.replace("\'", "''")
+
         noise = request.args.get('noise')
         noiseComments = request.args.get('noiseComments')
+        noiseComments = noiseComments.replace("\'", "''")
+
+
         responsive = request.args.get('responsive')
         responsiveComments = request.args.get('responsiveComments')
+        responsiveComments = responsiveComments.replace("\'", "''")
+
+
         landlord = request.args.get('landlord')
         landlordComments = request.args.get('landlordComments')
+        landlordComments = landlordComments.replace("\'", "''")
+
         pest = request.args.get('pest')
         pestComments = request.args.get('pestComments')
+        pestComments = pestComments.replace("\'", "''")
+
         safety = request.args.get('safety')
         safetyComments = request.args.get('safetyComments')
+        safetyComments = safetyComments.replace("\'", "''")
+
         appliance = request.args.get('appliance')
         applianceComments = request.args.get('applianceComments')
+        applianceComments = applianceComments.replace("\'", "''")
         
         transport = request.args.get("transport")
         transportBool = ""
@@ -94,6 +108,7 @@ def createReview():
             transportBool = "1"
         
         transportComments = request.args.get("transportComments")
+        transportComments = transportComments.replace("\'", "''")
 
         furnished = request.args.get("furnished")
         furnishedBool = ""
@@ -103,8 +118,12 @@ def createReview():
             furnishedBool = "1"
 
         furnishedComments = request.args.get("furnishedComments")
+        furnishedComments = furnishedComments.replace("\'", "''")
+
         utility = request.args.get("utility")
+
         finalThoughts = request.args.get("finalThoughts")
+        finalThoughts = finalThoughts.replace("\'", "''")
 
         engine = create_engine(DATABASE_NAME)
         Session = sessionmaker(bind = engine)
@@ -142,8 +161,7 @@ def findDetails():
 def getContent():
     try:
         address = request.args.get('address')
-        address = address.replace("\'", "")
-        address = address.replace("\"", "")
+        address = address.replace("\'", "''")
 
         engine = create_engine(DATABASE_NAME)
         Session = sessionmaker(bind = engine)
@@ -243,8 +261,7 @@ def getContent():
 def findMoreDetails():
     try:
         address = request.args.get('address')
-        address = address.replace("\'", "")
-        address = address.replace("\"", "")
+        address = address.replace("\'", "''")
         rating = request.args.get('rating')
         
         html = render_template("findMoreDetails.html", address=address, rating=rating)
@@ -282,8 +299,7 @@ def getMoreContent():
     
     try:
         address = request.args.get('address')
-        address = address.replace("\'", "")
-        address = address.replace("\"", "")
+        address = address.replace("\'", "''")
         totalRating = request.args.get('rating')
 
         engine = create_engine(DATABASE_NAME)
