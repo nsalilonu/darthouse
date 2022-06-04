@@ -511,7 +511,7 @@ def getMoreContent():
                                     Is there anything else a future tenant should know about this property?:<br>\
                                         "+str(review[25])+"<br><br><br>\
                             </div>\
-                        </div>"
+                        </div><br><br><br>"
 
 
             if (color == color1):
