@@ -63,6 +63,10 @@ def createReview():
     try:
         requestId = str(uuid.uuid4())
         address = request.args.get('address')
+
+        address = address.replace("\'", "")
+        address = address.replace("\"", "")
+
         startDate = request.args.get('startDate')
 
         endDate = request.args.get('endDate')
@@ -138,6 +142,8 @@ def findDetails():
 def getContent():
     try:
         address = request.args.get('address')
+        address = address.replace("\'", "")
+        address = address.replace("\"", "")
 
         engine = create_engine(DATABASE_NAME)
         Session = sessionmaker(bind = engine)
@@ -237,6 +243,8 @@ def getContent():
 def findMoreDetails():
     try:
         address = request.args.get('address')
+        address = address.replace("\'", "")
+        address = address.replace("\"", "")
         rating = request.args.get('rating')
         
         html = render_template("findMoreDetails.html", address=address, rating=rating)
@@ -274,6 +282,8 @@ def getMoreContent():
     
     try:
         address = request.args.get('address')
+        address = address.replace("\'", "")
+        address = address.replace("\"", "")
         totalRating = request.args.get('rating')
 
         engine = create_engine(DATABASE_NAME)
